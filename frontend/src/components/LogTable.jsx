@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const severityStyle = {
   low: 'text-zinc-400 bg-zinc-800/50',
@@ -18,10 +19,12 @@ const eventIcon = {
 };
 
 export default function LogTable({ logs, newIds = new Set() }) {
+  const { t } = useTranslation();
+
   if (!logs || logs.length === 0) {
     return (
       <div className="text-center py-8 text-zinc-500 font-mono text-sm">
-        보안 로그 없음
+        {t('logTable.empty')}
       </div>
     );
   }
@@ -31,11 +34,11 @@ export default function LogTable({ logs, newIds = new Set() }) {
       <table className="w-full text-sm font-mono">
         <thead>
           <tr className="border-b border-zinc-800 text-zinc-500 text-xs uppercase tracking-wider">
-            <th className="text-left py-2 pr-4">시각</th>
-            <th className="text-left py-2 pr-4">유형</th>
-            <th className="text-left py-2 pr-4">심각도</th>
-            <th className="text-left py-2 pr-4">IP</th>
-            <th className="text-left py-2">상세</th>
+            <th className="text-left py-2 pr-4">{t('logTable.thTime')}</th>
+            <th className="text-left py-2 pr-4">{t('logTable.thType')}</th>
+            <th className="text-left py-2 pr-4">{t('logTable.thSeverity')}</th>
+            <th className="text-left py-2 pr-4">{t('logTable.thIp')}</th>
+            <th className="text-left py-2">{t('logTable.thDetail')}</th>
           </tr>
         </thead>
         <tbody>
@@ -45,7 +48,7 @@ export default function LogTable({ logs, newIds = new Set() }) {
               className={`border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors ${newIds.has(log.id) ? 'log-row-new' : ''} ${severityStyle[log.severity]}`}
             >
               <td className="py-2 pr-4 whitespace-nowrap text-zinc-500">
-                {new Date(log.created_at).toLocaleTimeString('ko-KR')}
+                {new Date(log.created_at).toLocaleTimeString()}
               </td>
               <td className="py-2 pr-4 whitespace-nowrap">
                 {eventIcon[log.event_type] || '⚡'} {log.event_type}
