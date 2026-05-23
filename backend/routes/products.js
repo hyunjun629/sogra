@@ -3,7 +3,7 @@ const sanitizeHtml = require('sanitize-html');
 const pool = require('../db');
 const { requireAuth, requireMerchant } = require('../middleware/auth');
 const { logSecurity } = require('../utils/logger');
-const { generateQrToken, verifyQrToken, buildQrUrl, generateStoreQrToken, verifyStoreQrToken, buildStoreQrUrl } = require('../utils/qr');
+const { generateQrToken, verifyQrToken, buildQrUrl, generateStoreQrToken, verifyStoreQrToken, buildStoreQrUrl, verifyTimedStoreQrToken, buildTimedStoreQrUrl } = require('../utils/qr');
 const { generatePromoText } = require('../utils/promo');
 
 const router = express.Router();
@@ -72,9 +72,9 @@ router.get('/store-public/:id', async (req, res) => {
       return res.json({ status: 'danger', message: '존재하지 않거나 위조 가능성이 있는 QR입니다.' });
     }
 
-    if (!token || !verifyStoreQrToken(store.id, store.created_at, token)) {
-      await logSecurity({ eventType: 'FAKE_QR_ACCESS', ipAddress: ip, detail: `Invalid store QR token for store_id=${id}: token=${token}`, severity: 'critical' });
-      return res.json({ status: 'danger', message: '토큰이 일치하지 않습니다. 위조된 QR일 수 있습니다.' });
+    if (!token || !verifyTimedStoreQrToken(store.id, token)) {
+      await logSecurity({ eventType: 'FAKE_QR_ACCESS', ipAddress: ip, detail: `Invalid/expired store QR token for store_id=${id}: token=${token}`, severity: 'critical' });
+      return res.json({ status: 'danger', message: '토큰이 만료되었거나 위조된 QR입니다.' });
     }
 
     const { rows: products } = await pool.query(
@@ -138,12 +138,21 @@ router.post('/', requireMerchant, async (req, res) => {
     const promoText = generatePromoText({ name, region: store.region, origin: origin || store.region });
 
     const { rows: [{ id: productId }] } = await pool.query(`
-      INSERT INTO products (store_id, owner_id, name, price, description, origin, allergy, image_url, ai_promo_text, qr_token, qr_expires_at, is_active, created_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'',$10,1,$11) RETURNING id
-    `, [store_id, req.user.id, name, parseInt(price), cleanDescription, origin || '', allergy || '', image_url || '', Date.now() + 30 * 24 * 60 * 60 * 1000, createdAt]);
+      INSERT INTO products
+        (store_id, owner_id, name, price, description, origin, allergy, image_url,
+         ai_promo_text, ai_promo_text_en, ai_promo_text_zh,
+         qr_token, qr_expires_at, is_active, created_at)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8, '','','', '',$9,1,$10)
+      RETURNING id
+    `, [store_id, req.user.id, name, parseInt(price), cleanDescription,
+        origin || '', allergy || '', image_url || '',
+        Date.now() + 30 * 24 * 60 * 60 * 1000, createdAt]);
 
     const token = generateQrToken(productId, createdAt);
-    await pool.query('UPDATE products SET qr_token=$1, ai_promo_text=$2 WHERE id=$3', [token, promoText, productId]);
+    await pool.query(
+      'UPDATE products SET qr_token=$1, ai_promo_text=$2 WHERE id=$3',
+      [token, promoText, productId]
+    );
 
     const { rows: [product] } = await pool.query('SELECT * FROM products WHERE id=$1', [productId]);
     return res.status(201).json({ product: { ...product, qr_url: buildQrUrl(productId, token) } });
@@ -217,16 +226,42 @@ router.get('/stores/my', requireMerchant, async (req, res) => {
   }
 });
 
+// 30초 회전 QR URL 발급 (상점 소유자 전용)
+router.get('/stores/:id/live-qr', requireMerchant, async (req, res) => {
+  try {
+    const storeId = parseInt(req.params.id);
+    const { rows } = await pool.query('SELECT id, owner_id FROM stores WHERE id=$1', [storeId]);
+    const store = rows[0];
+    if (!store) return res.status(404).json({ error: '상점을 찾을 수 없습니다.' });
+    if (store.owner_id !== req.user.id) return res.status(403).json({ error: '권한이 없습니다.' });
+
+    const { url, expiresIn } = buildTimedStoreQrUrl(storeId);
+    return res.json({ url, expiresIn });
+  } catch (e) {
+    return res.status(500).json({ error: '서버 오류' });
+  }
+});
+
 router.post('/stores', requireMerchant, async (req, res) => {
   try {
     const { name, region, location } = req.body;
     if (!name || !region) return res.status(400).json({ error: '상점명과 지역을 입력해주세요.' });
     const validRegions = ['대전', '세종', '충남', '충북'];
     if (!validRegions.includes(region)) return res.status(400).json({ error: '유효하지 않은 지역입니다.' });
+
+    // 지역 기본 좌표 (지도 표시용)
+    const REGION_COORDS = {
+      '대전': { lat: 36.3504, lng: 127.3845 },
+      '세종': { lat: 36.4800, lng: 127.2890 },
+      '충남': { lat: 36.5184, lng: 126.8000 },
+      '충북': { lat: 36.6357, lng: 127.4917 },
+    };
+    const coords = REGION_COORDS[region];
+
     const createdAt = Date.now();
     const { rows: [newStore] } = await pool.query(
-      'INSERT INTO stores (owner_id, name, region, location, status, created_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [req.user.id, name, region, location || '', 'pending', createdAt]
+      'INSERT INTO stores (owner_id, name, region, location, status, latitude, longitude, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
+      [req.user.id, name, region, location || '', 'pending', coords.lat, coords.lng, createdAt]
     );
     const storeToken = generateStoreQrToken(newStore.id, createdAt);
     await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3',

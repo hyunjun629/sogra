@@ -125,6 +125,7 @@
     "storeQrModalLink": "QR 링크",
     "storeQrModalOpen": "페이지 열기",
     "storeQrModalCopy": "복사",
+    "qrRotating": "30초마다 자동 갱신 (큐싱 방지)",
     "storeQrModalCopied": "링크 복사됨",
     "statusApproved": "승인됨",
     "statusPending": "승인 대기",
@@ -309,6 +310,25 @@
     "thSeverity": "심각도",
     "thIp": "IP",
     "thDetail": "상세"
+  },
+  "storeMap": {
+    "title": "공식 인증 상점 지도",
+    "certifiedCount": "인증 상점 {{count}}개 표시 중",
+    "searchPlaceholder": "상점명 검색...",
+    "storeDetail": "상점 정보",
+    "certified": "공식 인증",
+    "productCount": "상품 {{count}}개",
+    "viewStore": "상점 바로가기 →",
+    "sameAsQr": "QR 스캔과 동일한 인증 페이지",
+    "loading": "지도 불러오는 중...",
+    "noStores": "검색 결과가 없습니다.",
+    "storeCountLabel": "개 인증 상점",
+    "navLink": "🗺️ 인증 상점 지도",
+    "regionAll": "전체",
+    "regionDaejeon": "대전",
+    "regionSejong": "세종",
+    "regionChungnam": "충남",
+    "regionChungbuk": "충북"
   },
   "attacker": {
     "backHome": "← 홈으로",

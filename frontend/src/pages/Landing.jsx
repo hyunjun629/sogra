@@ -157,7 +157,7 @@ export default function Landing() {
       </section>
 
       {/* Map */}
-      <section className="px-4 py-16 max-w-4xl mx-auto">
+      <section className="px-4 py-16 max-w-3xl mx-auto">
         <motion.h2 {...fadeUp()} className="text-2xl font-bold text-center text-zinc-100 mb-4">
           {t('landing.mapTitle')}
         </motion.h2>

@@ -125,6 +125,7 @@
     "storeQrModalLink": "QR 链接",
     "storeQrModalOpen": "打开页面",
     "storeQrModalCopy": "复制",
+    "qrRotating": "每30秒自动刷新（防止二维码钓鱼）",
     "storeQrModalCopied": "链接已复制",
     "statusApproved": "已审批",
     "statusPending": "待审批",
@@ -309,6 +310,25 @@
     "thSeverity": "严重程度",
     "thIp": "IP",
     "thDetail": "详情"
+  },
+  "storeMap": {
+    "title": "官方认证店铺地图",
+    "certifiedCount": "显示 {{count}} 个认证店铺",
+    "searchPlaceholder": "搜索店铺名称...",
+    "storeDetail": "店铺信息",
+    "certified": "官方认证",
+    "productCount": "{{count}} 个商品",
+    "viewStore": "进入店铺 →",
+    "sameAsQr": "与扫描QR码页面相同",
+    "loading": "地图加载中...",
+    "noStores": "未找到相关结果。",
+    "storeCountLabel": "个认证店铺",
+    "navLink": "🗺️ 店铺地图",
+    "regionAll": "全部",
+    "regionDaejeon": "大田",
+    "regionSejong": "世宗",
+    "regionChungnam": "忠清南道",
+    "regionChungbuk": "忠清北道"
   },
   "attacker": {
     "backHome": "← 返回首页",

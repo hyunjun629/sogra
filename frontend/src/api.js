@@ -14,13 +14,15 @@ async function request(method, path, body, opts = {}) {
     ...opts
   });
 
-  if (res.status === 401) {
+  const data = await res.json().catch(() => ({}));
+
+  // 인증 엔드포인트(/auth/)는 401이어도 리다이렉트 안 함 → 에러로 throw
+  if (res.status === 401 && !path.startsWith('/auth/')) {
     clearAuth();
     window.location.href = '/login';
     return;
   }
 
-  const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || '오류가 발생했습니다.');
   return data;
 }
@@ -43,7 +45,9 @@ export const api = {
   deleteProduct: (id) => request('DELETE', `/products/${id}`),
 
   // Stores
+  getPublicStores: () => request('GET', '/stores'),
   getMyStores: () => request('GET', '/products/stores/my'),
+  getStoreLiveQr: (id) => request('GET', `/products/stores/${id}/live-qr`),
   createStore: (data) => request('POST', '/products/stores', data),
 
   // Reports
