@@ -1,2 +1,2 @@
 #!/bin/sh
-cd frontend && npm install && npm run build
+cd frontend && npm install --include=dev && npm run build
