@@ -1,18 +1,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const statusColors = {
   idle: 'bg-zinc-700 text-zinc-300',
   running: 'bg-amber-700 text-amber-200',
   success: 'bg-emerald-700 text-emerald-200',
   error: 'bg-red-700 text-red-200'
-};
-
-const statusLabel = {
-  idle: '대기',
-  running: '실행중...',
-  success: '탐지·차단',
-  error: '오류'
 };
 
 const cardBorderColor = {
@@ -23,6 +17,15 @@ const cardBorderColor = {
 };
 
 export default function AttackButton({ icon, label, description, status = 'idle', onClick, disabled }) {
+  const { t } = useTranslation();
+
+  const statusLabel = {
+    idle: t('attackButton.idle'),
+    running: t('attackButton.running'),
+    success: t('attackButton.success'),
+    error: t('attackButton.error'),
+  };
+
   return (
     <motion.div
       className={`card relative flex items-center gap-4 transition-colors overflow-hidden ${cardBorderColor[status]}`}
@@ -63,11 +66,10 @@ export default function AttackButton({ icon, label, description, status = 'idle'
           whileHover={!disabled && status !== 'running' ? { scale: 1.05 } : {}}
           whileTap={!disabled && status !== 'running' ? { scale: 0.95 } : {}}
         >
-          시연
+          {t('attackButton.run')}
         </motion.button>
       </div>
 
-      {/* 성공 시 초록 shimmer 효과 */}
       {status === 'success' && (
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none"

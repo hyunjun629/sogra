@@ -1,18 +1,31 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { getUser, isLoggedIn, clearAuth } from '../auth';
 import { useTheme } from '../context/ThemeContext';
+
+const LANGS = [
+  { code: 'ko', label: '한' },
+  { code: 'en', label: 'EN' },
+  { code: 'zh', label: '中' },
+];
 
 export default function Navbar() {
   const navigate = useNavigate();
   const user = getUser();
   const loggedIn = isLoggedIn();
   const { isDark, toggle } = useTheme();
+  const { t, i18n } = useTranslation();
 
   function handleLogout() {
     clearAuth();
     navigate('/');
+  }
+
+  function changeLanguage(code) {
+    i18n.changeLanguage(code);
+    localStorage.setItem('ls_lang', code);
   }
 
   return (
@@ -21,17 +34,34 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-2">
           <span className="text-indigo-400 text-xl">🛡️</span>
           <span className="font-bold text-zinc-100 text-lg">대충실드 QR</span>
-          <span className="text-zinc-500 text-xs hidden sm:block">Daejeon, Chungcheong-do QR</span>
+          <span className="text-zinc-500 text-xs hidden sm:block">{t('nav.subtitle')}</span>
         </Link>
 
         <div className="flex items-center gap-3">
-          {/* 다크/라이트 토글 */}
+          {/* Language switcher */}
+          <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-0.5">
+            {LANGS.map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => changeLanguage(lang.code)}
+                className={`text-xs font-semibold px-2 py-1 rounded-md transition-colors ${
+                  i18n.language === lang.code
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Dark/light toggle */}
           <motion.button
             onClick={toggle}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             className="w-9 h-9 flex items-center justify-center rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors text-lg"
-            title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            title={isDark ? t('nav.lightMode') : t('nav.darkMode')}
             aria-label="테마 전환"
           >
             <motion.span
@@ -48,20 +78,20 @@ export default function Navbar() {
             <>
               <span className="text-zinc-400 text-sm hidden sm:block">{user?.email}</span>
               <span className={`text-xs px-2 py-0.5 rounded-full ${user?.role === 'admin' ? 'bg-purple-900/50 text-purple-400' : 'bg-indigo-900/50 text-indigo-400'}`}>
-                {user?.role === 'admin' ? '관리자' : '상인'}
+                {user?.role === 'admin' ? t('nav.admin') : t('nav.merchant')}
               </span>
               {user?.role === 'merchant' && (
-                <Link to="/merchant" className="text-sm text-zinc-300 hover:text-white transition-colors">내 상점</Link>
+                <Link to="/merchant" className="text-sm text-zinc-300 hover:text-white transition-colors">{t('nav.myStore')}</Link>
               )}
               {user?.role === 'admin' && (
-                <Link to="/admin" className="text-sm text-zinc-300 hover:text-white transition-colors">관제 센터</Link>
+                <Link to="/admin" className="text-sm text-zinc-300 hover:text-white transition-colors">{t('nav.controlCenter')}</Link>
               )}
-              <button onClick={handleLogout} className="btn-ghost text-sm py-1.5 px-3">로그아웃</button>
+              <button onClick={handleLogout} className="btn-ghost text-sm py-1.5 px-3">{t('nav.logout')}</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm text-zinc-300 hover:text-white transition-colors">로그인</Link>
-              <Link to="/register" className="btn-primary text-sm py-1.5 px-3">가입하기</Link>
+              <Link to="/login" className="text-sm text-zinc-300 hover:text-white transition-colors">{t('nav.login')}</Link>
+              <Link to="/register" className="btn-primary text-sm py-1.5 px-3">{t('nav.register')}</Link>
             </>
           )}
         </div>

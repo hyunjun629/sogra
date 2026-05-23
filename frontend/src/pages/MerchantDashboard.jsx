@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { getUser } from '../auth';
 import { SkeletonCard } from '../components/Skeleton';
 
 export default function MerchantDashboard() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,10 +26,10 @@ export default function MerchantDashboard() {
   }, []);
 
   async function handleDelete(id) {
-    if (!confirm('상품을 비활성화 하시겠습니까?')) return;
+    if (!confirm(t('dashboard.deleteConfirm'))) return;
     await api.deleteProduct(id);
     setProducts(prev => prev.filter(p => p.id !== id));
-    showToast('상품이 비활성화되었습니다.');
+    showToast(t('dashboard.deleteSuccess'));
   }
 
   function showToast(msg) {
@@ -36,9 +38,9 @@ export default function MerchantDashboard() {
   }
 
   const statusBadge = (status) => ({
-    approved: <span className="badge-safe">승인됨</span>,
-    pending: <span className="badge-warning">승인 대기</span>,
-    flagged: <span className="badge-danger">신고됨</span>,
+    approved: <span className="badge-safe">{t('dashboard.statusApproved')}</span>,
+    pending: <span className="badge-warning">{t('dashboard.statusPending')}</span>,
+    flagged: <span className="badge-danger">{t('dashboard.statusFlagged')}</span>,
   }[status] || null);
 
   return (
@@ -59,15 +61,15 @@ export default function MerchantDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">내 상점 대시보드</h1>
+          <h1 className="text-2xl font-bold text-zinc-100">{t('dashboard.title')}</h1>
           <p className="text-zinc-500 text-sm mt-1">{user?.email}</p>
         </div>
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Link to="/merchant/products/new" className="btn-primary">+ 상품 등록</Link>
+          <Link to="/merchant/products/new" className="btn-primary">{t('dashboard.addProduct')}</Link>
         </motion.div>
       </div>
 
-      {/* 상점 승인 상태 배너 — 상점 단위 승인 안내 */}
+      {/* Store approval banner */}
       {!loading && stores.length > 0 && (() => {
         const allApproved = stores.every(s => s.status === 'approved');
         const anyFlagged = stores.some(s => s.status === 'flagged');
@@ -81,8 +83,14 @@ export default function MerchantDashboard() {
             >
               <span className="text-2xl">✅</span>
               <div>
-                <p className="font-semibold text-emerald-400">상점이 승인되었습니다</p>
-                <p className="text-sm text-zinc-400 mt-0.5">상품을 자유롭게 등록할 수 있으며, QR 스캔 시 <strong className="text-emerald-400">공식 인증</strong>으로 표시됩니다.</p>
+                <p className="font-semibold text-emerald-400">{t('dashboard.bannerApprovedTitle')}</p>
+                <p className="text-sm text-zinc-400 mt-0.5">
+                  {t('dashboard.bannerApprovedDesc').split(t('dashboard.bannerApprovedHighlight')).map((part, i, arr) =>
+                    i < arr.length - 1
+                      ? <React.Fragment key={i}>{part}<strong className="text-emerald-400">{t('dashboard.bannerApprovedHighlight')}</strong></React.Fragment>
+                      : part
+                  )}
+                </p>
               </div>
             </motion.div>
           );
@@ -96,8 +104,14 @@ export default function MerchantDashboard() {
             >
               <span className="text-2xl">🚨</span>
               <div>
-                <p className="font-semibold text-red-400">상점에 신고가 접수되었습니다</p>
-                <p className="text-sm text-zinc-400 mt-0.5">관리자 검토 후 조치가 이루어집니다. QR이 <strong className="text-amber-400">주의</strong> 상태로 표시됩니다.</p>
+                <p className="font-semibold text-red-400">{t('dashboard.bannerFlaggedTitle')}</p>
+                <p className="text-sm text-zinc-400 mt-0.5">
+                  {t('dashboard.bannerFlaggedDesc').split(t('dashboard.bannerFlaggedHighlight')).map((part, i, arr) =>
+                    i < arr.length - 1
+                      ? <React.Fragment key={i}>{part}<strong className="text-amber-400">{t('dashboard.bannerFlaggedHighlight')}</strong></React.Fragment>
+                      : part
+                  )}
+                </p>
               </div>
             </motion.div>
           );
@@ -111,8 +125,14 @@ export default function MerchantDashboard() {
             >
               <span className="text-2xl">⏳</span>
               <div>
-                <p className="font-semibold text-amber-400">상점 승인 대기 중</p>
-                <p className="text-sm text-zinc-400 mt-0.5">관리자가 상점을 검토 중입니다. 지금도 상품을 등록할 수 있으며, <strong className="text-amber-400">상점 승인 후</strong> QR이 공식 인증으로 표시됩니다.</p>
+                <p className="font-semibold text-amber-400">{t('dashboard.bannerPendingTitle')}</p>
+                <p className="text-sm text-zinc-400 mt-0.5">
+                  {t('dashboard.bannerPendingDesc').split(t('dashboard.bannerPendingHighlight')).map((part, i, arr) =>
+                    i < arr.length - 1
+                      ? <React.Fragment key={i}>{part}<strong className="text-amber-400">{t('dashboard.bannerPendingHighlight')}</strong></React.Fragment>
+                      : part
+                  )}
+                </p>
               </div>
             </motion.div>
           );
@@ -121,7 +141,7 @@ export default function MerchantDashboard() {
 
       {/* Stores */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-zinc-300 mb-4">내 상점</h2>
+        <h2 className="text-lg font-semibold text-zinc-300 mb-4">{t('dashboard.storesTitle')}</h2>
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[0, 1].map(i => (
@@ -138,7 +158,7 @@ export default function MerchantDashboard() {
           </div>
         ) : stores.length === 0 ? (
           <div className="card text-center py-8">
-            <p className="text-zinc-500 mb-4">등록된 상점이 없습니다. 상품을 등록하면 상점을 만들 수 있습니다.</p>
+            <p className="text-zinc-500 mb-4">{t('dashboard.storesEmpty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -159,10 +179,10 @@ export default function MerchantDashboard() {
                 </div>
                 <p className="text-xs text-zinc-600 mt-3">
                   {s.status === 'approved'
-                    ? '✅ 이 상점의 모든 상품 QR이 공식 인증 상태입니다.'
+                    ? t('dashboard.storeApproved')
                     : s.status === 'pending'
-                    ? '⏳ 승인 후 QR이 공식 인증으로 전환됩니다.'
-                    : '🚨 관리자 검토 중입니다.'}
+                    ? t('dashboard.storePending')
+                    : t('dashboard.storeFlagged')}
                 </p>
               </motion.div>
             ))}
@@ -173,7 +193,7 @@ export default function MerchantDashboard() {
       {/* Products */}
       <div>
         <h2 className="text-lg font-semibold text-zinc-300 mb-4">
-          내 상품 {!loading && `(${products.length})`}
+          {t('dashboard.productsTitle')} {!loading && `(${products.length})`}
         </h2>
 
         {loading ? (
@@ -182,8 +202,8 @@ export default function MerchantDashboard() {
           </div>
         ) : products.length === 0 ? (
           <div className="card text-center py-12">
-            <p className="text-zinc-500 mb-4">등록된 상품이 없습니다.</p>
-            <Link to="/merchant/products/new" className="btn-primary">첫 상품 등록하기</Link>
+            <p className="text-zinc-500 mb-4">{t('dashboard.productsEmpty')}</p>
+            <Link to="/merchant/products/new" className="btn-primary">{t('dashboard.productsAddFirst')}</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -201,7 +221,6 @@ export default function MerchantDashboard() {
                 )}
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-zinc-100">{p.name}</h3>
-                  {/* 상점 단위 승인 — 상품별 배지 불필요 */}
                 </div>
                 <p className="text-indigo-400 font-bold mb-1">{p.price.toLocaleString()}원</p>
                 <p className="text-xs text-zinc-500 mb-3">{p.store_name} · {p.region}</p>
@@ -215,7 +234,7 @@ export default function MerchantDashboard() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    📱 QR 보기
+                    {t('dashboard.qrButton')}
                   </motion.button>
                   <motion.button
                     onClick={() => handleDelete(p.id)}
@@ -223,7 +242,7 @@ export default function MerchantDashboard() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    삭제
+                    {t('dashboard.deleteButton')}
                   </motion.button>
                 </div>
               </motion.div>
@@ -251,7 +270,7 @@ export default function MerchantDashboard() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-zinc-100">공식 인증 QR</h3>
+                <h3 className="font-bold text-zinc-100">{t('dashboard.qrModalTitle')}</h3>
                 <button onClick={() => setSelectedQr(null)} className="text-zinc-500 hover:text-zinc-300 text-xl">✕</button>
               </div>
               <div className="flex justify-center mb-4">
@@ -262,18 +281,18 @@ export default function MerchantDashboard() {
               <p className="text-center font-semibold text-zinc-200 mb-1">{selectedQr.name}</p>
               <p className="text-center text-indigo-400 font-bold mb-3">{selectedQr.price.toLocaleString()}원</p>
               <div className="bg-zinc-800 rounded-lg p-3 mb-4">
-                <p className="text-xs text-zinc-500 mb-1">QR 링크</p>
+                <p className="text-xs text-zinc-500 mb-1">{t('dashboard.qrModalLink')}</p>
                 <p className="text-xs font-mono text-zinc-300 break-all">{selectedQr.qr_url}</p>
               </div>
               <div className="flex gap-2">
                 <a href={selectedQr.qr_url} target="_blank" rel="noopener noreferrer" className="btn-primary text-sm py-2 flex-1 text-center">
-                  페이지 열기
+                  {t('dashboard.qrModalOpen')}
                 </a>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(selectedQr.qr_url); showToast('링크 복사됨'); }}
+                  onClick={() => { navigator.clipboard.writeText(selectedQr.qr_url); showToast(t('dashboard.qrModalCopied')); }}
                   className="btn-ghost text-sm py-2 px-4"
                 >
-                  복사
+                  {t('dashboard.qrModalCopy')}
                 </button>
               </div>
             </motion.div>

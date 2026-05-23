@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api';
-
-const REGIONS = ['대전', '세종', '충남', '충북'];
 
 export default function ProductCreate() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [stores, setStores] = useState([]);
   const [showCreateStore, setShowCreateStore] = useState(false);
   const [storeName, setStoreName] = useState('');
@@ -16,6 +16,13 @@ export default function ProductCreate() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [created, setCreated] = useState(null);
+
+  const REGIONS = [
+    { value: '대전', labelKey: 'productCreate.regionDaejeon' },
+    { value: '세종', labelKey: 'productCreate.regionSejong' },
+    { value: '충남', labelKey: 'productCreate.regionChungnam' },
+    { value: '충북', labelKey: 'productCreate.regionChungbuk' },
+  ];
 
   useEffect(() => {
     api.getMyStores().then(d => {
@@ -56,8 +63,8 @@ export default function ProductCreate() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="card text-center">
           <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-zinc-100 mb-2">상품 등록 완료!</h2>
-          <p className="text-zinc-500 mb-6">공식 HMAC QR이 자동 생성되었습니다.</p>
+          <h2 className="text-2xl font-bold text-zinc-100 mb-2">{t('productCreate.successTitle')}</h2>
+          <p className="text-zinc-500 mb-6">{t('productCreate.successSubtitle')}</p>
           <div className="flex justify-center mb-6">
             <div className="bg-white p-4 rounded-xl">
               <QRCodeSVG value={created.qr_url} size={200} />
@@ -67,17 +74,17 @@ export default function ProductCreate() {
           <p className="text-indigo-400 font-bold mb-4">{Number(created.price).toLocaleString()}원</p>
           {created.ai_promo_text && (
             <div className="bg-zinc-800 rounded-xl p-4 mb-4 text-left">
-              <p className="text-xs text-zinc-500 mb-2">🤖 AI 홍보 문구 (자동 생성)</p>
+              <p className="text-xs text-zinc-500 mb-2">{t('productCreate.aiPromoLabel')}</p>
               <p className="text-sm text-zinc-300 whitespace-pre-line">{created.ai_promo_text}</p>
             </div>
           )}
           <div className="bg-zinc-800 rounded-xl p-4 mb-6 text-left">
-            <p className="text-xs text-zinc-500 mb-1">🔗 QR 링크</p>
+            <p className="text-xs text-zinc-500 mb-1">{t('productCreate.qrLinkLabel')}</p>
             <p className="text-xs font-mono text-zinc-300 break-all">{created.qr_url}</p>
           </div>
           <div className="flex gap-3 justify-center">
-            <a href={created.qr_url} target="_blank" rel="noopener noreferrer" className="btn-primary">QR 페이지 확인</a>
-            <button onClick={() => navigate('/merchant')} className="btn-ghost">대시보드로</button>
+            <a href={created.qr_url} target="_blank" rel="noopener noreferrer" className="btn-primary">{t('productCreate.viewQr')}</a>
+            <button onClick={() => navigate('/merchant')} className="btn-ghost">{t('productCreate.goToDashboard')}</button>
           </div>
         </div>
       </div>
@@ -87,32 +94,32 @@ export default function ProductCreate() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-100">상품 등록</h1>
-        <p className="text-zinc-500 text-sm mt-1">등록 즉시 HMAC 서명 QR이 자동 생성됩니다</p>
+        <h1 className="text-2xl font-bold text-zinc-100">{t('productCreate.title')}</h1>
+        <p className="text-zinc-500 text-sm mt-1">{t('productCreate.subtitle')}</p>
       </div>
 
       {/* Store creation */}
       {showCreateStore && (
         <div className="card mb-6 border-amber-700/50">
-          <h3 className="font-semibold text-amber-400 mb-4">⚠️ 상점이 없습니다. 먼저 상점을 만들어주세요.</h3>
+          <h3 className="font-semibold text-amber-400 mb-4">{t('productCreate.noStoreWarn')}</h3>
           <form onSubmit={handleCreateStore}>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-1.5">상점명 *</label>
+                <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeName')}</label>
                 <input className="input" value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="OO상회" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-1.5">지역 *</label>
+                <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeRegion')}</label>
                 <select className="input" value={storeRegion} onChange={e => setStoreRegion(e.target.value)}>
-                  {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                  {REGIONS.map(r => <option key={r.value} value={r.value}>{t(r.labelKey)}</option>)}
                 </select>
               </div>
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">위치</label>
-              <input className="input" value={storeLocation} onChange={e => setStoreLocation(e.target.value)} placeholder="예: 대전 중앙시장 B동 12호" />
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeLocation')}</label>
+              <input className="input" value={storeLocation} onChange={e => setStoreLocation(e.target.value)} placeholder={t('productCreate.storeLocationPlaceholder')} />
             </div>
-            <button type="submit" className="btn-primary">상점 생성</button>
+            <button type="submit" className="btn-primary">{t('productCreate.createStore')}</button>
           </form>
         </div>
       )}
@@ -124,7 +131,7 @@ export default function ProductCreate() {
 
         {stores.length > 0 && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">상점 *</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeLabel')}</label>
             <select className="input" value={form.store_id} onChange={e => setForm(f => ({ ...f, store_id: e.target.value }))}>
               {stores.map(s => <option key={s.id} value={s.id}>{s.name} ({s.region})</option>)}
             </select>
@@ -133,41 +140,41 @@ export default function ProductCreate() {
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">상품명 *</label>
-            <input className="input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="예: 성심당 튀김소보로" required />
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.productName')}</label>
+            <input className="input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={t('productCreate.productNamePlaceholder')} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">가격 (원) *</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.price')}</label>
             <input type="number" className="input" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="2500" required min="0" />
           </div>
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-zinc-400 mb-1.5">상품 설명</label>
-          <textarea className="input min-h-24 resize-none" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="XSS 공격 시도 시 자동 탐지 및 정제됩니다." />
+          <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.description')}</label>
+          <textarea className="input min-h-24 resize-none" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder={t('productCreate.descriptionPlaceholder')} />
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">원산지</label>
-            <input className="input" value={form.origin} onChange={e => setForm(f => ({ ...f, origin: e.target.value }))} placeholder="예: 대전 직접 생산" />
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.origin')}</label>
+            <input className="input" value={form.origin} onChange={e => setForm(f => ({ ...f, origin: e.target.value }))} placeholder={t('productCreate.originPlaceholder')} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">알레르기 정보</label>
-            <input className="input" value={form.allergy} onChange={e => setForm(f => ({ ...f, allergy: e.target.value }))} placeholder="예: 밀, 우유" />
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.allergy')}</label>
+            <input className="input" value={form.allergy} onChange={e => setForm(f => ({ ...f, allergy: e.target.value }))} placeholder={t('productCreate.allergyPlaceholder')} />
           </div>
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-zinc-400 mb-1.5">이미지 URL</label>
+          <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.imageUrl')}</label>
           <input className="input" value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} placeholder="https://example.com/image.jpg" />
         </div>
 
         <div className="flex gap-3">
           <button type="submit" disabled={loading || !form.store_id} className="btn-primary flex-1 py-2.5">
-            {loading ? '등록 중...' : '🔐 상품 등록 + QR 생성'}
+            {loading ? t('productCreate.loading') : t('productCreate.submit')}
           </button>
-          <button type="button" onClick={() => navigate('/merchant')} className="btn-ghost px-6">취소</button>
+          <button type="button" onClick={() => navigate('/merchant')} className="btn-ghost px-6">{t('productCreate.cancel')}</button>
         </div>
       </form>
     </div>
