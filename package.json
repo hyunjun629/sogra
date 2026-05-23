@@ -1,0 +1,26 @@
+{
+  "name": "localshield-qr",
+  "version": "1.0.0",
+  "description": "대전·충청 소상공인을 위한 공식 인증 QR 상품 페이지 플랫폼",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "node backend/server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.10.0",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sanitize-html": "^2.12.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

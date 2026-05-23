@@ -1,0 +1,9 @@
+node_modules/
+frontend/node_modules/
+.env
+backend/localshield.db
+backend/localshield.db-shm
+backend/localshield.db-wal
+.DS_Store
+dist/
+frontend/dist/
