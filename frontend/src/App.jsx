@@ -1,6 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { getUser, isLoggedIn } from './auth';
+import { ThemeProvider } from './context/ThemeContext';
 
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -22,12 +24,26 @@ function RequireAuth({ children, role }) {
   return children;
 }
 
-export default function App() {
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+const pageTransition = { duration: 0.18, ease: 'easeOut' };
+
+function AnimatedRoutes() {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-zinc-950">
-        <Navbar />
-        <Routes>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={pageTransition}
+      >
+        <Routes location={location}>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -39,7 +55,20 @@ export default function App() {
           <Route path="/demo/attacker" element={<AttackerView />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
-    </BrowserRouter>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-zinc-950">
+          <Navbar />
+          <AnimatedRoutes />
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

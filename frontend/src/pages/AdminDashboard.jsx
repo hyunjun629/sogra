@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import LogTable from '../components/LogTable';
 import AttackButton from '../components/AttackButton';
+import { SkeletonStatCard } from '../components/Skeleton';
 import { api } from '../api';
 
 const ATTACK_COLORS = {
@@ -35,6 +37,7 @@ export default function AdminDashboard() {
   const [toast, setToast] = useState('');
   const [resetConfirm, setResetConfirm] = useState(false);
   const [criticalAlert, setCriticalAlert] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
   const lastLogTime = useRef(0);
   const pollingRef = useRef(null);
 
@@ -47,8 +50,11 @@ export default function AdminDashboard() {
     try {
       const d = await api.getStats();
       setStats(d);
+      setStatsLoading(false);
       if (d.criticalLogs > 0) setCriticalAlert(true);
-    } catch {}
+    } catch {
+      setStatsLoading(false);
+    }
   }, []);
 
   const pollLogs = useCallback(async () => {
@@ -150,11 +156,19 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Toast */}
-      {toast && (
-        <div className="fixed top-20 right-4 bg-zinc-800 text-zinc-100 px-5 py-3 rounded-xl shadow-xl z-50 border border-zinc-700 animate-slide-in">
-          {toast}
-        </div>
-      )}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key="toast"
+            initial={{ opacity: 0, y: -20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed top-20 right-4 bg-zinc-800 text-zinc-100 px-5 py-3 rounded-xl shadow-xl z-50 border border-zinc-700"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -184,20 +198,31 @@ export default function AdminDashboard() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: '등록 상인', value: stats?.totalUsers ?? '—', icon: '👤', color: 'indigo' },
-          { label: '등록 상점', value: stats?.totalStores ?? '—', icon: '🏪', color: 'emerald' },
-          { label: '활성 상품', value: stats?.totalProducts ?? '—', icon: '📦', color: 'cyan' },
-          { label: '24h 위협', value: stats?.criticalLogs ?? '—', icon: '🚨', color: 'red' },
-        ].map(s => (
-          <div key={s.label} className="card text-center">
-            <div className="text-2xl mb-2">{s.icon}</div>
-            <div className={`text-3xl font-bold mb-1 ${s.color === 'red' && (stats?.criticalLogs > 0) ? 'text-red-400' : s.color === 'indigo' ? 'text-indigo-400' : s.color === 'emerald' ? 'text-emerald-400' : s.color === 'cyan' ? 'text-cyan-400' : 'text-zinc-100'}`}>
-              {s.value}
-            </div>
-            <div className="text-xs text-zinc-500">{s.label}</div>
-          </div>
-        ))}
+        {statsLoading ? (
+          [0, 1, 2, 3].map(i => <SkeletonStatCard key={i} />)
+        ) : (
+          [
+            { label: '등록 상인', value: stats?.totalUsers ?? '—', icon: '👤', color: 'indigo' },
+            { label: '등록 상점', value: stats?.totalStores ?? '—', icon: '🏪', color: 'emerald' },
+            { label: '활성 상품', value: stats?.totalProducts ?? '—', icon: '📦', color: 'cyan' },
+            { label: '24h 위협', value: stats?.criticalLogs ?? '—', icon: '🚨', color: 'red' },
+          ].map((s, i) => (
+            <motion.div
+              key={s.label}
+              className="card text-center"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.06 }}
+              whileHover={{ y: -2, transition: { duration: 0.15 } }}
+            >
+              <div className="text-2xl mb-2">{s.icon}</div>
+              <div className={`text-3xl font-bold mb-1 ${s.color === 'red' && (stats?.criticalLogs > 0) ? 'text-red-400' : s.color === 'indigo' ? 'text-indigo-400' : s.color === 'emerald' ? 'text-emerald-400' : s.color === 'cyan' ? 'text-cyan-400' : 'text-zinc-100'}`}>
+                {s.value}
+              </div>
+              <div className="text-xs text-zinc-500">{s.label}</div>
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Tabs */}

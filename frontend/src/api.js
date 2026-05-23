@@ -28,7 +28,8 @@ async function request(method, path, body, opts = {}) {
 export const api = {
   // Auth
   login: (email, password) => request('POST', '/auth/login', { email, password }),
-  register: (email, password) => request('POST', '/auth/register', { email, password }),
+  register: (email, password, business_number) => request('POST', '/auth/register', { email, password, business_number }),
+  verifyBusiness: (business_number) => request('POST', '/auth/verify-business', { business_number }),
   me: () => request('GET', '/auth/me'),
 
   // Products
