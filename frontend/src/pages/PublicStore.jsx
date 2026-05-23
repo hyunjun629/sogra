@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
+import { loc } from '../utils/locale';
 
 export default function PublicStore() {
   const { id } = useParams();
@@ -9,7 +10,8 @@ export default function PublicStore() {
   const token = searchParams.get('token') || '';
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || 'ko';
 
   useEffect(() => {
     api.getPublicStore(id, token)
@@ -70,10 +72,10 @@ export default function PublicStore() {
       {store && (
         <>
           <div className="card mb-6">
-            <h1 className="text-2xl font-bold text-zinc-100 mb-1">{store.name}</h1>
+            <h1 className="text-2xl font-bold text-zinc-100 mb-1">{loc(store, 'name', lang)}</h1>
             <p className="text-sm text-zinc-400">
               📍 {store.region}
-              {store.location && ` · ${store.location}`}
+              {store.location && ` · ${loc(store, 'location', lang)}`}
             </p>
           </div>
 
@@ -91,7 +93,7 @@ export default function PublicStore() {
           ) : (
             <div className="flex flex-col gap-4">
               {products.map(p => (
-                <ProductCard key={p.id} product={p} t={t} />
+                <ProductCard key={p.id} product={p} t={t} lang={lang} />
               ))}
             </div>
           )}
@@ -101,7 +103,7 @@ export default function PublicStore() {
   );
 }
 
-function ProductCard({ product: p, t }) {
+function ProductCard({ product: p, t, lang }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -117,14 +119,14 @@ function ProductCard({ product: p, t }) {
         )}
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start gap-2">
-            <h3 className="font-semibold text-zinc-100 text-lg leading-tight">{p.name}</h3>
+            <h3 className="font-semibold text-zinc-100 text-lg leading-tight">{loc(p, 'name', lang)}</h3>
             <span className="text-indigo-400 font-bold whitespace-nowrap">{p.price.toLocaleString()}{t('common.priceUnit')}</span>
           </div>
           {p.origin && (
-            <p className="text-sm text-zinc-500 mt-1">🌾 {t('publicStore.originLabel')}: {p.origin}</p>
+            <p className="text-sm text-zinc-500 mt-1">🌾 {t('publicStore.originLabel')}: {loc(p, 'origin', lang)}</p>
           )}
           {p.allergy && (
-            <p className="text-sm text-amber-500/80 mt-0.5">⚠️ {t('publicStore.allergyLabel')}: {p.allergy}</p>
+            <p className="text-sm text-amber-500/80 mt-0.5">⚠️ {t('publicStore.allergyLabel')}: {loc(p, 'allergy', lang)}</p>
           )}
           <button
             onClick={() => setOpen(v => !v)}
@@ -138,7 +140,7 @@ function ProductCard({ product: p, t }) {
       {open && (
         <div className="mt-4 pt-4 border-t border-zinc-800">
           {p.description && (
-            <p className="text-sm text-zinc-400 bg-zinc-800 rounded-lg p-3 mb-3">{p.description}</p>
+            <p className="text-sm text-zinc-400 bg-zinc-800 rounded-lg p-3 mb-3">{loc(p, 'description', lang)}</p>
           )}
           {p.ai_promo_text && (
             <div className="bg-indigo-950/30 border border-indigo-800/30 rounded-xl p-3">

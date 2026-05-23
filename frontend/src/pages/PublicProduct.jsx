@@ -5,12 +5,14 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { SkeletonProductVerify } from '../components/Skeleton';
+import { loc } from '../utils/locale';
 
 export default function PublicProduct() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || 'ko';
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -93,7 +95,7 @@ export default function PublicProduct() {
                 <p className="text-sm text-zinc-400">{message}</p>
               </div>
             </div>
-            {product && <ProductDetails product={product} t={t} />}
+            {product && <ProductDetails product={product} t={t} lang={lang} />}
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <Link to={`/product/${id}/report`} className="text-amber-400 text-sm hover:underline">{t('publicProduct.reportLink')}</Link>
             </div>
@@ -126,7 +128,7 @@ export default function PublicProduct() {
               <p className="text-sm text-zinc-400">{t('publicProduct.successSubtitle')}</p>
             </div>
           </div>
-          {product && <ProductDetails product={product} t={t} />}
+          {product && <ProductDetails product={product} t={t} lang={lang} />}
           <div className="mt-6 border-t border-zinc-800 pt-4 flex gap-3">
             <Link to={`/product/${id}/report`} className="text-zinc-500 text-sm hover:text-zinc-400">{t('publicProduct.reportLink')}</Link>
           </div>
@@ -136,7 +138,7 @@ export default function PublicProduct() {
   );
 }
 
-function ProductDetails({ product, t }) {
+function ProductDetails({ product, t, lang }) {
   const qrUrl = `http://localhost:5173/product/${product.id}?token=${product.qr_token}`;
   return (
     <div>
@@ -144,14 +146,14 @@ function ProductDetails({ product, t }) {
         <img src={product.image_url} alt={product.name} className="w-full h-56 object-cover rounded-xl mb-4" onError={e => e.target.style.display='none'} />
       )}
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-zinc-100 mb-1">{product.name}</h1>
+        <h1 className="text-2xl font-bold text-zinc-100 mb-1">{loc(product, 'name', lang)}</h1>
         <p className="text-2xl font-bold text-indigo-400 mb-2">{product.price.toLocaleString()}{t('common.priceUnit')}</p>
         <p className="text-sm text-zinc-400 mb-1">📍 {product.store_name} — {product.store_region}</p>
-        {product.origin && <p className="text-sm text-zinc-500">🌾 {t('publicProduct.originLabel')}: {product.origin}</p>}
-        {product.allergy && <p className="text-sm text-zinc-500">⚠️ {t('publicProduct.allergyLabel')}: {product.allergy}</p>}
+        {product.origin && <p className="text-sm text-zinc-500">🌾 {t('publicProduct.originLabel')}: {loc(product, 'origin', lang)}</p>}
+        {product.allergy && <p className="text-sm text-zinc-500">⚠️ {t('publicProduct.allergyLabel')}: {loc(product, 'allergy', lang)}</p>}
       </div>
       {product.description && (
-        <p className="text-sm text-zinc-400 bg-zinc-800 rounded-lg p-3 mb-4">{product.description}</p>
+        <p className="text-sm text-zinc-400 bg-zinc-800 rounded-lg p-3 mb-4">{loc(product, 'description', lang)}</p>
       )}
       {product.ai_promo_text && (
         <div className="bg-indigo-950/30 border border-indigo-800/30 rounded-xl p-3 mb-4">

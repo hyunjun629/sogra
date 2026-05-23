@@ -6,6 +6,18 @@ async function migrate() {
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS business_verified BOOLEAN DEFAULT FALSE`);
   await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS qr_token TEXT`);
   await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS qr_expires_at BIGINT`);
+  await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS name_en TEXT`);
+  await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS name_zh TEXT`);
+  await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS location_en TEXT`);
+  await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS location_zh TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS name_en TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS name_zh TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS description_en TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS description_zh TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS origin_en TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS origin_zh TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS allergy_en TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS allergy_zh TEXT`);
 
   const { rows } = await pool.query(`SELECT id, created_at FROM stores WHERE qr_token IS NULL OR qr_token = ''`);
   for (const store of rows) {
