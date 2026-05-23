@@ -31,6 +31,9 @@ export const api = {
   register: (email, password) => request('POST', '/auth/register', { email, password }),
   me: () => request('GET', '/auth/me'),
 
+  // Public store
+  getPublicStore: (id, token) => request('GET', `/products/store-public/${id}?token=${encodeURIComponent(token || '')}`),
+
   // Products
   getPublicProduct: (id, token) => request('GET', `/products/public/${id}?token=${encodeURIComponent(token || '')}`),
   getMyProducts: () => request('GET', '/products/my'),

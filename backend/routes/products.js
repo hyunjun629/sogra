@@ -3,7 +3,7 @@ const sanitizeHtml = require('sanitize-html');
 const pool = require('../db');
 const { requireAuth, requireMerchant } = require('../middleware/auth');
 const { logSecurity } = require('../utils/logger');
-const { generateQrToken, verifyQrToken, buildQrUrl } = require('../utils/qr');
+const { generateQrToken, verifyQrToken, buildQrUrl, generateStoreQrToken, verifyStoreQrToken, buildStoreQrUrl } = require('../utils/qr');
 const { generatePromoText } = require('../utils/promo');
 
 const router = express.Router();
@@ -38,6 +38,48 @@ router.get('/public/:id', async (req, res) => {
     if (product.store_status === 'pending') return res.json({ status: 'warning', message: '승인 대기 중인 상점입니다.', product });
     if (product.store_status === 'flagged') return res.json({ status: 'warning', message: '신고가 접수된 상점입니다.', product });
     return res.json({ status: 'safe', message: '공식 인증된 대충실드 QR 페이지입니다.', product });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+router.get('/store-public/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { token } = req.query;
+    const ip = req.ip;
+
+    const { rows: storeRows } = await pool.query('SELECT * FROM stores WHERE id=$1', [id]);
+    const store = storeRows[0];
+
+    if (!store) {
+      await logSecurity({ eventType: 'FAKE_QR_ACCESS', ipAddress: ip, detail: `Store not found: id=${id}, token=${token}`, severity: 'critical' });
+      return res.json({ status: 'danger', message: '존재하지 않거나 위조 가능성이 있는 QR입니다.' });
+    }
+
+    if (!token || !verifyStoreQrToken(store.id, store.created_at, token)) {
+      await logSecurity({ eventType: 'FAKE_QR_ACCESS', ipAddress: ip, detail: `Invalid store QR token for store_id=${id}: token=${token}`, severity: 'critical' });
+      return res.json({ status: 'danger', message: '토큰이 일치하지 않습니다. 위조된 QR일 수 있습니다.' });
+    }
+
+    const { rows: products } = await pool.query(
+      `SELECT * FROM products WHERE store_id=$1 AND is_active=1 ORDER BY created_at DESC`,
+      [id]
+    );
+
+    const statusMap = { approved: 'safe', pending: 'warning', flagged: 'warning' };
+    const msgMap = {
+      approved: '공식 인증된 대충실드 QR 페이지입니다.',
+      pending: '승인 대기 중인 상점입니다.',
+      flagged: '신고가 접수된 상점입니다.',
+    };
+    return res.json({
+      status: statusMap[store.status] || 'warning',
+      message: msgMap[store.status] || '확인 중인 상점입니다.',
+      store,
+      products,
+    });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: '서버 오류' });
@@ -150,7 +192,12 @@ router.delete('/:id', requireMerchant, async (req, res) => {
 router.get('/stores/my', requireMerchant, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM stores WHERE owner_id=$1', [req.user.id]);
-    return res.json({ stores: rows });
+    return res.json({
+      stores: rows.map(s => ({
+        ...s,
+        store_qr_url: s.qr_token ? buildStoreQrUrl(s.id, s.qr_token) : null,
+      })),
+    });
   } catch (e) {
     return res.status(500).json({ error: '서버 오류' });
   }
@@ -162,10 +209,15 @@ router.post('/stores', requireMerchant, async (req, res) => {
     if (!name || !region) return res.status(400).json({ error: '상점명과 지역을 입력해주세요.' });
     const validRegions = ['대전', '세종', '충남', '충북'];
     if (!validRegions.includes(region)) return res.status(400).json({ error: '유효하지 않은 지역입니다.' });
-    const { rows: [store] } = await pool.query(
+    const createdAt = Date.now();
+    const { rows: [newStore] } = await pool.query(
       'INSERT INTO stores (owner_id, name, region, location, status, created_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
-      [req.user.id, name, region, location || '', 'pending', Date.now()]
+      [req.user.id, name, region, location || '', 'pending', createdAt]
     );
+    const storeToken = generateStoreQrToken(newStore.id, createdAt);
+    await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3',
+      [storeToken, createdAt + 365 * 24 * 60 * 60 * 1000, newStore.id]);
+    const store = { ...newStore, qr_token: storeToken, store_qr_url: buildStoreQrUrl(newStore.id, storeToken) };
     return res.status(201).json({ store });
   } catch (e) {
     return res.status(500).json({ error: '서버 오류' });

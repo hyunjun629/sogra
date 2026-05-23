@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const pool = require('./db');
-const { generateQrToken } = require('./utils/qr');
+const { generateQrToken, generateStoreQrToken } = require('./utils/qr');
 const { generatePromoText } = require('./utils/promo');
 
 async function seed() {
@@ -31,14 +31,22 @@ async function seed() {
     'INSERT INTO stores (owner_id, name, region, location, status, created_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
     [merchantId, 'OO상회', '대전', '대전 중앙시장 B동 12호', 'approved', now]
   );
+  await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3',
+    [generateStoreQrToken(store1Id, now), now + 365 * 24 * 60 * 60 * 1000, store1Id]);
+
   const { rows: [{ id: store2Id }] } = await pool.query(
     'INSERT INTO stores (owner_id, name, region, location, status, created_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
     [merchantId, '청년떡집', '대전', '대전 유성구 봉명동 55-3', 'approved', now]
   );
+  await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3',
+    [generateStoreQrToken(store2Id, now), now + 365 * 24 * 60 * 60 * 1000, store2Id]);
+
   const { rows: [{ id: store3Id }] } = await pool.query(
     'INSERT INTO stores (owner_id, name, region, location, status, created_at) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
     [pendingUserId, '한솔수산', '세종', '세종 한솔동 주민시장 내', 'pending', now]
   );
+  await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3',
+    [generateStoreQrToken(store3Id, now), now + 365 * 24 * 60 * 60 * 1000, store3Id]);
 
   const productsData = [
     { store_id: store1Id, owner_id: merchantId, name: '성심당 튀김소보로', price: 2500, description: '대전의 명물 성심당에서 엄선한 튀김소보로. 겉은 바삭, 속은 촉촉한 소보로빵.', origin: '대전', allergy: '밀, 우유, 달걀', image_url: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=600', region: '대전' },

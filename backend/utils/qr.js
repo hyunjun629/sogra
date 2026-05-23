@@ -20,4 +20,20 @@ function buildQrUrl(productId, token) {
   return `${FRONTEND_URL}/product/${productId}?token=${token}`;
 }
 
-module.exports = { generateQrToken, verifyQrToken, buildQrUrl };
+function generateStoreQrToken(storeId, createdAt) {
+  return crypto
+    .createHmac('sha256', QR_SECRET)
+    .update(`store:${storeId}:${createdAt}`)
+    .digest('hex')
+    .slice(0, 32);
+}
+
+function verifyStoreQrToken(storeId, createdAt, token) {
+  return generateStoreQrToken(storeId, createdAt) === token;
+}
+
+function buildStoreQrUrl(storeId, token) {
+  return `${FRONTEND_URL}/store/${storeId}?token=${token}`;
+}
+
+module.exports = { generateQrToken, verifyQrToken, buildQrUrl, generateStoreQrToken, verifyStoreQrToken, buildStoreQrUrl };

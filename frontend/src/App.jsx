@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import MerchantDashboard from './pages/MerchantDashboard';
 import ProductCreate from './pages/ProductCreate';
 import PublicProduct from './pages/PublicProduct';
+import PublicStore from './pages/PublicStore';
 import Report from './pages/Report';
 import AdminDashboard from './pages/AdminDashboard';
 import AttackerView from './pages/AttackerView';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/merchant" element={<RequireAuth role="merchant"><MerchantDashboard /></RequireAuth>} />
           <Route path="/merchant/products/new" element={<RequireAuth role="merchant"><ProductCreate /></RequireAuth>} />
+          <Route path="/store/:id" element={<PublicStore />} />
           <Route path="/product/:id" element={<PublicProduct />} />
           <Route path="/product/:id/report" element={<Report />} />
           <Route path="/admin" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
