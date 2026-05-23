@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api';
+import { loc } from '../utils/locale';
 import { getUser } from '../auth';
 import { SkeletonCard } from '../components/Skeleton';
 
 export default function MerchantDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || 'ko';
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -230,7 +232,7 @@ export default function MerchantDashboard() {
                 <p className="text-indigo-400 font-bold mb-1">{p.price.toLocaleString()}{t('common.priceUnit')}</p>
                 <p className="text-xs text-zinc-500 mb-3">{p.store_name} · {p.region}</p>
                 {p.ai_promo_text && (
-                  <p className="text-xs text-zinc-400 bg-zinc-800 rounded-lg p-2 mb-3 whitespace-pre-line">{p.ai_promo_text}</p>
+                  <p className="text-xs text-zinc-400 bg-zinc-800 rounded-lg p-2 mb-3 whitespace-pre-line">{loc(p, 'ai_promo_text', lang)}</p>
                 )}
                 <div className="flex gap-2">
                   <motion.button
