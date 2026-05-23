@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
 const QR_SECRET = process.env.QR_SECRET || 'localshield_qr_hmac_secret';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 function generateQrToken(productId, createdAt) {
   return crypto
@@ -16,7 +17,7 @@ function verifyQrToken(productId, createdAt, token) {
 }
 
 function buildQrUrl(productId, token) {
-  return `http://localhost:5173/product/${productId}?token=${token}`;
+  return `${FRONTEND_URL}/product/${productId}?token=${token}`;
 }
 
 module.exports = { generateQrToken, verifyQrToken, buildQrUrl };
