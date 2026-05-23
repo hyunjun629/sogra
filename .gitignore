@@ -7,3 +7,4 @@ backend/localshield.db-wal
 .DS_Store
 dist/
 frontend/dist/
+.vercel
