@@ -74,6 +74,7 @@ export default function Navbar() {
             </motion.span>
           </motion.button>
 
+
           {loggedIn ? (
             <>
               <span className="text-zinc-400 text-sm hidden sm:block">{user?.email}</span>

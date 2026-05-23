@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
@@ -15,8 +15,34 @@ export default function MerchantDashboard() {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStoreQr, setSelectedStoreQr] = useState(null);
+  const [liveQrUrl, setLiveQrUrl] = useState(null);
+  const [countdown, setCountdown] = useState(30);
   const [toast, setToast] = useState('');
+  const countdownRef = useRef(30);
   const user = getUser();
+
+  // 30초 회전 QR — 모달 열릴 때 시작, 닫힐 때 정리
+  useEffect(() => {
+    if (!selectedStoreQr) {
+      setLiveQrUrl(null);
+      return;
+    }
+    async function refresh() {
+      try {
+        const data = await api.getStoreLiveQr(selectedStoreQr.id);
+        setLiveQrUrl(data.url);
+        countdownRef.current = Math.ceil(data.expiresIn / 1000);
+        setCountdown(countdownRef.current);
+      } catch {}
+    }
+    refresh();
+    const tick = setInterval(() => {
+      countdownRef.current -= 1;
+      setCountdown(countdownRef.current);
+      if (countdownRef.current <= 0) refresh();
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [selectedStoreQr?.id]);
 
   useEffect(() => {
     Promise.all([api.getMyProducts(), api.getMyStores()])
@@ -272,23 +298,43 @@ export default function MerchantDashboard() {
                 <h3 className="font-bold text-zinc-100">{t('dashboard.storeQrModalTitle')}</h3>
                 <button onClick={() => setSelectedStoreQr(null)} className="text-zinc-500 hover:text-zinc-300 text-xl">✕</button>
               </div>
+              {/* 카운트다운 진행바 */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-zinc-500">🔄 {t('dashboard.qrRotating')}</span>
+                  <span className={`font-mono font-bold ${countdown <= 5 ? 'text-amber-400' : 'text-indigo-400'}`}>
+                    {countdown}s
+                  </span>
+                </div>
+                <div className="h-1.5 bg-zinc-700 rounded-full overflow-hidden">
+                  <motion.div
+                    className={`h-full rounded-full ${countdown <= 5 ? 'bg-amber-400' : 'bg-indigo-500'}`}
+                    animate={{ width: `${(countdown / 30) * 100}%` }}
+                    transition={{ duration: 0.4 }}
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-center mb-4">
                 <div className="bg-white p-4 rounded-xl">
-                  <QRCodeSVG value={selectedStoreQr.store_qr_url} size={180} />
+                  {liveQrUrl
+                    ? <QRCodeSVG value={liveQrUrl} size={180} />
+                    : <div className="w-[180px] h-[180px] flex items-center justify-center text-zinc-400 text-sm">로딩 중...</div>
+                  }
                 </div>
               </div>
               <p className="text-center font-semibold text-zinc-200 mb-1">{selectedStoreQr.name}</p>
               <p className="text-center text-sm text-zinc-500 mb-3">{selectedStoreQr.region} · {selectedStoreQr.location}</p>
               <div className="bg-zinc-800 rounded-lg p-3 mb-4">
                 <p className="text-xs text-zinc-500 mb-1">{t('dashboard.storeQrModalLink')}</p>
-                <p className="text-xs font-mono text-zinc-300 break-all">{selectedStoreQr.store_qr_url}</p>
+                <p className="text-xs font-mono text-zinc-300 break-all">{liveQrUrl || '...'}</p>
               </div>
               <div className="flex gap-2">
-                <a href={selectedStoreQr.store_qr_url} target="_blank" rel="noopener noreferrer" className="btn-primary text-sm py-2 flex-1 text-center">
+                <a href={liveQrUrl || '#'} target="_blank" rel="noopener noreferrer" className="btn-primary text-sm py-2 flex-1 text-center">
                   {t('dashboard.storeQrModalOpen')}
                 </a>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(selectedStoreQr.store_qr_url); showToast(t('dashboard.storeQrModalCopied')); }}
+                  onClick={() => { if (liveQrUrl) { navigator.clipboard.writeText(liveQrUrl); showToast(t('dashboard.storeQrModalCopied')); } }}
                   className="btn-ghost text-sm py-2 px-4"
                 >{t('dashboard.storeQrModalCopy')}</button>
               </div>

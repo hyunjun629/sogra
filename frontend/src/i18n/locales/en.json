@@ -125,6 +125,7 @@
     "storeQrModalLink": "QR Link",
     "storeQrModalOpen": "Open Page",
     "storeQrModalCopy": "Copy",
+    "qrRotating": "Auto-refresh every 30s (anti-quishing)",
     "storeQrModalCopied": "Link copied",
     "statusApproved": "Approved",
     "statusPending": "Pending",
@@ -309,6 +310,25 @@
     "thSeverity": "Severity",
     "thIp": "IP",
     "thDetail": "Detail"
+  },
+  "storeMap": {
+    "title": "Certified Store Map",
+    "certifiedCount": "{{count}} certified stores",
+    "searchPlaceholder": "Search stores...",
+    "storeDetail": "Store Info",
+    "certified": "Official Certified",
+    "productCount": "{{count}} products",
+    "viewStore": "Visit Store →",
+    "sameAsQr": "Same page as QR scan",
+    "loading": "Loading map...",
+    "noStores": "No results found.",
+    "storeCountLabel": "certified stores",
+    "navLink": "🗺️ Store Map",
+    "regionAll": "All",
+    "regionDaejeon": "Daejeon",
+    "regionSejong": "Sejong",
+    "regionChungnam": "S. Chungcheong",
+    "regionChungbuk": "N. Chungcheong"
   },
   "attacker": {
     "backHome": "← Back to Home",
