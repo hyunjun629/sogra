@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const pool = require('./db');
 const { generateQrToken, generateStoreQrToken } = require('./utils/qr');
-const { generatePromoText } = require('./utils/promo');
+const { generatePromoText, generatePromoTextEn, generatePromoTextZh } = require('./utils/promo');
 
 async function seed() {
   const { rows } = await pool.query('SELECT COUNT(*) as cnt FROM users');
@@ -65,7 +65,7 @@ async function seed() {
 
   const productsData = [
     {
-      store_id: store1Id, owner_id: merchantId, region: '대전',
+      store_id: store1Id, owner_id: merchantId, region: '대전', region_en: 'Daejeon', region_zh: '大田',
       name: '성심당 튀김소보로',
       name_en: 'Sungsimdang Fried Soborro', name_zh: '圣心堂炸酥饼',
       price: 2500,
@@ -77,7 +77,7 @@ async function seed() {
       image_url: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=600',
     },
     {
-      store_id: store1Id, owner_id: merchantId, region: '대전',
+      store_id: store1Id, owner_id: merchantId, region: '대전', region_en: 'Daejeon', region_zh: '大田',
       name: '대전 한밭식혜',
       name_en: 'Daejeon Hanbat Sikhye', name_zh: '大田汉밧甜米露',
       price: 4000,
@@ -89,7 +89,7 @@ async function seed() {
       image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600',
     },
     {
-      store_id: store1Id, owner_id: merchantId, region: '충남',
+      store_id: store1Id, owner_id: merchantId, region: '충남', region_en: 'South Chungcheong', region_zh: '忠清南道',
       name: '충남 서산 6년근 인삼',
       name_en: 'Seosan 6-Year Ginseng', name_zh: '忠南瑞山6年根人参',
       price: 85000,
@@ -101,7 +101,7 @@ async function seed() {
       image_url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600',
     },
     {
-      store_id: store3Id, owner_id: pendingUserId, region: '세종',
+      store_id: store3Id, owner_id: pendingUserId, region: '세종', region_en: 'Sejong', region_zh: '世宗',
       name: '한솔수산 갈치',
       name_en: 'Hansol Hairtail Fish', name_zh: '汉索水产带鱼',
       price: 35000,
@@ -113,7 +113,7 @@ async function seed() {
       image_url: 'https://images.unsplash.com/photo-1559847844-5315695dadae?w=600',
     },
     {
-      store_id: store2Id, owner_id: merchantId, region: '충북',
+      store_id: store2Id, owner_id: merchantId, region: '충북', region_en: 'North Chungcheong', region_zh: '忠清北道',
       name: '청남대 막걸리',
       name_en: 'Cheongnamdae Makgeolli', name_zh: '青南台米酒',
       price: 6000,
@@ -129,16 +129,18 @@ async function seed() {
   for (const p of productsData) {
     const createdAt = now - Math.floor(Math.random() * 86400000);
     const promoText = generatePromoText({ name: p.name, region: p.region, origin: p.origin });
+    const promoTextEn = generatePromoTextEn({ name_en: p.name_en, region_en: p.region_en, origin_en: p.origin_en });
+    const promoTextZh = generatePromoTextZh({ name_zh: p.name_zh, region_zh: p.region_zh, origin_zh: p.origin_zh });
     const { rows: [{ id: productId }] } = await pool.query(
       `INSERT INTO products
         (store_id, owner_id, name, name_en, name_zh, price, description, description_en, description_zh,
          origin, origin_en, origin_zh, allergy, allergy_en, allergy_zh,
-         image_url, ai_promo_text, qr_token, qr_expires_at, is_active, created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,'',$18,1,$19) RETURNING id`,
+         image_url, ai_promo_text, ai_promo_text_en, ai_promo_text_zh, qr_token, qr_expires_at, is_active, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,'',$20,1,$21) RETURNING id`,
       [p.store_id, p.owner_id, p.name, p.name_en, p.name_zh, p.price,
        p.description, p.description_en, p.description_zh,
        p.origin, p.origin_en, p.origin_zh, p.allergy, p.allergy_en, p.allergy_zh,
-       p.image_url, promoText, now + 30 * 24 * 60 * 60 * 1000, createdAt]
+       p.image_url, promoText, promoTextEn, promoTextZh, now + 30 * 24 * 60 * 60 * 1000, createdAt]
     );
     const token = generateQrToken(productId, createdAt);
     await pool.query('UPDATE products SET qr_token=$1 WHERE id=$2', [token, productId]);

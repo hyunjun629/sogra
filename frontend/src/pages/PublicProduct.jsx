@@ -158,7 +158,7 @@ function ProductDetails({ product, t, lang }) {
       {product.ai_promo_text && (
         <div className="bg-indigo-950/30 border border-indigo-800/30 rounded-xl p-3 mb-4">
           <p className="text-xs text-indigo-400 mb-1">{t('publicProduct.aiPromoLabel')}</p>
-          <p className="text-sm text-zinc-300 whitespace-pre-line">{product.ai_promo_text}</p>
+          <p className="text-sm text-zinc-300 whitespace-pre-line">{loc(product, 'ai_promo_text', lang)}</p>
         </div>
       )}
       <div className="flex justify-center mt-4">

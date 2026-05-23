@@ -145,7 +145,7 @@ function ProductCard({ product: p, t, lang }) {
           {p.ai_promo_text && (
             <div className="bg-indigo-950/30 border border-indigo-800/30 rounded-xl p-3">
               <p className="text-xs text-indigo-400 mb-1">{t('publicStore.aiPromoLabel')}</p>
-              <p className="text-sm text-zinc-300 whitespace-pre-line">{p.ai_promo_text}</p>
+              <p className="text-sm text-zinc-300 whitespace-pre-line">{loc(p, 'ai_promo_text', lang)}</p>
             </div>
           )}
         </div>

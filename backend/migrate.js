@@ -18,6 +18,8 @@ async function migrate() {
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS origin_zh TEXT`);
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS allergy_en TEXT`);
   await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS allergy_zh TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ai_promo_text_en TEXT`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ai_promo_text_zh TEXT`);
 
   const { rows } = await pool.query(`SELECT id, created_at FROM stores WHERE qr_token IS NULL OR qr_token = ''`);
   for (const store of rows) {
