@@ -105,7 +105,7 @@ router.get('/my', requireMerchant, async (req, res) => {
     const { rows } = await pool.query(`
       SELECT p.*, s.name as store_name, s.status as store_status, s.region
       FROM products p JOIN stores s ON p.store_id = s.id
-      WHERE p.owner_id = $1 ORDER BY p.created_at DESC
+      WHERE p.owner_id = $1 AND p.is_active = 1 ORDER BY p.created_at DESC
     `, [req.user.id]);
     return res.json({ products: rows.map(p => ({ ...p, qr_url: buildQrUrl(p.id, p.qr_token) })) });
   } catch (e) {
