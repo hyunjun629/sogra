@@ -33,8 +33,10 @@ app.use((err, req, res, next) => {
 
 // 로컬 실행 시 seed 후 listen, Vercel에서는 module.exports만 사용
 if (require.main === module) {
+  const migrate = require('./migrate');
   const seed = require('./seed');
-  seed()
+  migrate()
+    .then(() => seed())
     .then(() => app.listen(PORT, () => console.log(`[대충실드 QR] Backend running on http://localhost:${PORT}`)))
     .catch(console.error);
 } else {

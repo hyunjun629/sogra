@@ -67,6 +67,58 @@ export default function MerchantDashboard() {
         </motion.div>
       </div>
 
+      {/* 상점 승인 상태 배너 — 상점 단위 승인 안내 */}
+      {!loading && stores.length > 0 && (() => {
+        const allApproved = stores.every(s => s.status === 'approved');
+        const anyFlagged = stores.some(s => s.status === 'flagged');
+        const anyPending = stores.some(s => s.status === 'pending');
+        if (allApproved) {
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-emerald-900/20 border border-emerald-700/40 rounded-2xl px-5 py-4 flex items-center gap-3"
+            >
+              <span className="text-2xl">✅</span>
+              <div>
+                <p className="font-semibold text-emerald-400">상점이 승인되었습니다</p>
+                <p className="text-sm text-zinc-400 mt-0.5">상품을 자유롭게 등록할 수 있으며, QR 스캔 시 <strong className="text-emerald-400">공식 인증</strong>으로 표시됩니다.</p>
+              </div>
+            </motion.div>
+          );
+        }
+        if (anyFlagged) {
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-red-900/20 border border-red-700/40 rounded-2xl px-5 py-4 flex items-center gap-3"
+            >
+              <span className="text-2xl">🚨</span>
+              <div>
+                <p className="font-semibold text-red-400">상점에 신고가 접수되었습니다</p>
+                <p className="text-sm text-zinc-400 mt-0.5">관리자 검토 후 조치가 이루어집니다. QR이 <strong className="text-amber-400">주의</strong> 상태로 표시됩니다.</p>
+              </div>
+            </motion.div>
+          );
+        }
+        if (anyPending) {
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-amber-900/20 border border-amber-700/40 rounded-2xl px-5 py-4 flex items-center gap-3"
+            >
+              <span className="text-2xl">⏳</span>
+              <div>
+                <p className="font-semibold text-amber-400">상점 승인 대기 중</p>
+                <p className="text-sm text-zinc-400 mt-0.5">관리자가 상점을 검토 중입니다. 지금도 상품을 등록할 수 있으며, <strong className="text-amber-400">상점 승인 후</strong> QR이 공식 인증으로 표시됩니다.</p>
+              </div>
+            </motion.div>
+          );
+        }
+      })()}
+
       {/* Stores */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-zinc-300 mb-4">내 상점</h2>
@@ -105,6 +157,13 @@ export default function MerchantDashboard() {
                   </div>
                   {statusBadge(s.status)}
                 </div>
+                <p className="text-xs text-zinc-600 mt-3">
+                  {s.status === 'approved'
+                    ? '✅ 이 상점의 모든 상품 QR이 공식 인증 상태입니다.'
+                    : s.status === 'pending'
+                    ? '⏳ 승인 후 QR이 공식 인증으로 전환됩니다.'
+                    : '🚨 관리자 검토 중입니다.'}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -142,7 +201,7 @@ export default function MerchantDashboard() {
                 )}
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-zinc-100">{p.name}</h3>
-                  {statusBadge(p.store_status)}
+                  {/* 상점 단위 승인 — 상품별 배지 불필요 */}
                 </div>
                 <p className="text-indigo-400 font-bold mb-1">{p.price.toLocaleString()}원</p>
                 <p className="text-xs text-zinc-500 mb-3">{p.store_name} · {p.region}</p>
