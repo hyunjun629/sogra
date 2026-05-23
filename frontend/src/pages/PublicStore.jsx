@@ -118,7 +118,7 @@ function ProductCard({ product: p, t }) {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start gap-2">
             <h3 className="font-semibold text-zinc-100 text-lg leading-tight">{p.name}</h3>
-            <span className="text-indigo-400 font-bold whitespace-nowrap">{p.price.toLocaleString()}원</span>
+            <span className="text-indigo-400 font-bold whitespace-nowrap">{p.price.toLocaleString()}{t('common.priceUnit')}</span>
           </div>
           {p.origin && (
             <p className="text-sm text-zinc-500 mt-1">🌾 {t('publicStore.originLabel')}: {p.origin}</p>

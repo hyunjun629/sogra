@@ -145,7 +145,7 @@ function ProductDetails({ product, t }) {
       )}
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-zinc-100 mb-1">{product.name}</h1>
-        <p className="text-2xl font-bold text-indigo-400 mb-2">{product.price.toLocaleString()}원</p>
+        <p className="text-2xl font-bold text-indigo-400 mb-2">{product.price.toLocaleString()}{t('common.priceUnit')}</p>
         <p className="text-sm text-zinc-400 mb-1">📍 {product.store_name} — {product.store_region}</p>
         {product.origin && <p className="text-sm text-zinc-500">🌾 {t('publicProduct.originLabel')}: {product.origin}</p>}
         {product.allergy && <p className="text-sm text-zinc-500">⚠️ {t('publicProduct.allergyLabel')}: {product.allergy}</p>}

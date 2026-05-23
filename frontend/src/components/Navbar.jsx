@@ -62,7 +62,7 @@ export default function Navbar() {
             whileTap={{ scale: 0.92 }}
             className="w-9 h-9 flex items-center justify-center rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors text-lg"
             title={isDark ? t('nav.lightMode') : t('nav.darkMode')}
-            aria-label="테마 전환"
+            aria-label={t('common.themeToggle')}
           >
             <motion.span
               key={isDark ? 'moon' : 'sun'}

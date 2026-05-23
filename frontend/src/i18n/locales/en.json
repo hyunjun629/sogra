@@ -1,4 +1,8 @@
 {
+  "common": {
+    "priceUnit": " KRW",
+    "themeToggle": "Toggle theme"
+  },
   "nav": {
     "subtitle": "Daejeon, Chungcheong QR",
     "myStore": "My Store",
@@ -83,7 +87,8 @@
     "step4Highlight": "Approved",
     "errPasswordMismatch": "Passwords do not match.",
     "errPasswordShort": "Password must be at least 4 characters.",
-    "errBizRequired": "Please enter a 10-digit business registration number."
+    "errBizRequired": "Please enter a 10-digit business registration number.",
+    "bizCheckError": "Verification error"
   },
   "dashboard": {
     "title": "My Store Dashboard",
@@ -129,6 +134,7 @@
     "title": "Register Product",
     "subtitle": "HMAC-signed QR is auto-generated immediately upon registration",
     "noStoreWarn": "⚠️ No store found. Please create a store first.",
+    "storeNamePlaceholder": "My Store",
     "storeName": "Store Name *",
     "storeRegion": "Region *",
     "storeLocation": "Location",

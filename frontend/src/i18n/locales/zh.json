@@ -1,4 +1,8 @@
 {
+  "common": {
+    "priceUnit": "韩元",
+    "themeToggle": "切换主题"
+  },
   "nav": {
     "subtitle": "大田·忠清 QR",
     "myStore": "我的店铺",
@@ -83,7 +87,8 @@
     "step4Highlight": "审批通过",
     "errPasswordMismatch": "两次密码不一致。",
     "errPasswordShort": "密码至少需要4个字符。",
-    "errBizRequired": "请输入10位营业执照号码。"
+    "errBizRequired": "请输入10位营业执照号码。",
+    "bizCheckError": "验证时出错"
   },
   "dashboard": {
     "title": "我的店铺仪表板",
@@ -129,6 +134,7 @@
     "title": "注册商品",
     "subtitle": "注册后立即自动生成 HMAC 签名 QR 码",
     "noStoreWarn": "⚠️ 暂无店铺，请先创建店铺。",
+    "storeNamePlaceholder": "我的店铺",
     "storeName": "店铺名称 *",
     "storeRegion": "地区 *",
     "storeLocation": "位置",

@@ -71,7 +71,7 @@ export default function ProductCreate() {
             </div>
           </div>
           <p className="font-semibold text-zinc-100 text-lg mb-1">{created.name}</p>
-          <p className="text-indigo-400 font-bold mb-4">{Number(created.price).toLocaleString()}원</p>
+          <p className="text-indigo-400 font-bold mb-4">{Number(created.price).toLocaleString()}{t('common.priceUnit')}</p>
           {created.ai_promo_text && (
             <div className="bg-zinc-800 rounded-xl p-4 mb-4 text-left">
               <p className="text-xs text-zinc-500 mb-2">{t('productCreate.aiPromoLabel')}</p>
@@ -106,7 +106,7 @@ export default function ProductCreate() {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeName')}</label>
-                <input className="input" value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="OO상회" required />
+                <input className="input" value={storeName} onChange={e => setStoreName(e.target.value)} placeholder={t('productCreate.storeNamePlaceholder')} required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('productCreate.storeRegion')}</label>

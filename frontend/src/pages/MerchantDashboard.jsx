@@ -227,7 +227,7 @@ export default function MerchantDashboard() {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-zinc-100">{p.name}</h3>
                 </div>
-                <p className="text-indigo-400 font-bold mb-1">{p.price.toLocaleString()}원</p>
+                <p className="text-indigo-400 font-bold mb-1">{p.price.toLocaleString()}{t('common.priceUnit')}</p>
                 <p className="text-xs text-zinc-500 mb-3">{p.store_name} · {p.region}</p>
                 {p.ai_promo_text && (
                   <p className="text-xs text-zinc-400 bg-zinc-800 rounded-lg p-2 mb-3 whitespace-pre-line">{p.ai_promo_text}</p>

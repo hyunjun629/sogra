@@ -39,10 +39,10 @@ export default function Register() {
         const res = await api.verifyBusiness(digits);
         setBizStatus({ valid: res.valid, message: res.message, checking: false });
       } catch {
-        setBizStatus({ valid: null, message: '검증 중 오류', checking: false });
+        setBizStatus({ valid: null, message: t('register.bizCheckError'), checking: false });
       }
     }, 400);
-  }, []);
+  }, [t]);
 
   async function handleSubmit(e) {
     e.preventDefault();
