@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { api } from '../api';
+import { SkeletonProductVerify } from '../components/Skeleton';
 
 export default function PublicProduct() {
   const { id } = useParams();
@@ -19,8 +21,20 @@ export default function PublicProduct() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-zinc-500 text-lg">🔍 QR 검증 중...</div>
+      <div className="min-h-screen flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-lg">
+          <div className="text-center mb-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
+              className="inline-block text-3xl mb-2"
+            >
+              🔍
+            </motion.div>
+            <p className="text-zinc-500 text-sm">QR 서명 검증 중...</p>
+          </div>
+          <SkeletonProductVerify />
+        </div>
       </div>
     );
   }
@@ -30,9 +44,21 @@ export default function PublicProduct() {
   if (status === 'danger') {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-md w-full">
+        <motion.div
+          className="max-w-md w-full"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="card border-red-700/50 text-center py-10">
-            <div className="text-6xl mb-6">🚨</div>
+            <motion.div
+              className="text-6xl mb-6"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.1 }}
+            >
+              🚨
+            </motion.div>
             <div className="badge-danger inline-block mb-4 text-base px-4 py-2">위험 — QR 검증 실패</div>
             <h2 className="text-xl font-bold text-red-400 mb-3">존재하지 않거나 위조 가능성이 있는 QR입니다</h2>
             <p className="text-zinc-400 mb-2">{message}</p>
@@ -43,7 +69,7 @@ export default function PublicProduct() {
             </div>
             <Link to="/" className="btn-ghost inline-block">홈으로 돌아가기</Link>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -51,7 +77,12 @@ export default function PublicProduct() {
   if (status === 'warning') {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-lg w-full">
+        <motion.div
+          className="max-w-lg w-full"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="card border-amber-700/50">
             <div className="flex items-center gap-3 mb-6">
               <div className="text-4xl">⚠️</div>
@@ -65,17 +96,29 @@ export default function PublicProduct() {
               <Link to={`/product/${id}/report`} className="text-amber-400 text-sm hover:underline">신고하기</Link>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-lg w-full">
+      <motion.div
+        className="max-w-lg w-full"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="card border-emerald-700/50">
           <div className="flex items-center gap-3 mb-6">
-            <div className="text-4xl">✅</div>
+            <motion.div
+              className="text-4xl"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+            >
+              ✅
+            </motion.div>
             <div>
               <div className="badge-safe inline-block mb-1">공식 인증 QR</div>
               <p className="text-sm text-zinc-400">공식 인증된 대충실드 QR 페이지입니다</p>
@@ -86,7 +129,7 @@ export default function PublicProduct() {
             <Link to={`/product/${id}/report`} className="text-zinc-500 text-sm hover:text-zinc-400">신고하기</Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
