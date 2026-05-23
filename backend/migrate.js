@@ -2,6 +2,8 @@ const pool = require('./db');
 const { generateStoreQrToken } = require('./utils/qr');
 
 async function migrate() {
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS business_number TEXT`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS business_verified BOOLEAN DEFAULT FALSE`);
   await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS qr_token TEXT`);
   await pool.query(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS qr_expires_at BIGINT`);
 
@@ -12,6 +14,7 @@ async function migrate() {
     await pool.query('UPDATE stores SET qr_token=$1, qr_expires_at=$2 WHERE id=$3', [token, expiresAt, store.id]);
   }
   if (rows.length > 0) console.log(`[Migrate] Generated QR tokens for ${rows.length} stores.`);
+  console.log('[Migrate] DB schema up to date.');
 }
 
 module.exports = migrate;
