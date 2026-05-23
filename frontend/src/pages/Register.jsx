@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api';
 import { setAuth } from '../auth';
 
@@ -13,11 +14,12 @@ function formatBizNum(raw) {
 
 export default function Register() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [bizNum, setBizNum] = useState('');
-  const [bizStatus, setBizStatus] = useState(null); // null | { valid, message, checking }
+  const [bizStatus, setBizStatus] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef(null);
@@ -30,7 +32,6 @@ export default function Register() {
     const digits = formatted.replace(/[^0-9]/g, '');
     if (digits.length !== 10) return;
 
-    // 10자리 완성 시 실시간 검증
     setBizStatus({ checking: true });
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
@@ -46,11 +47,11 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    if (password !== confirm) return setError('비밀번호가 일치하지 않습니다.');
-    if (password.length < 4) return setError('비밀번호는 4자 이상이어야 합니다.');
+    if (password !== confirm) return setError(t('register.errPasswordMismatch'));
+    if (password.length < 4) return setError(t('register.errPasswordShort'));
 
     const digits = bizNum.replace(/[^0-9]/g, '');
-    if (digits.length !== 10) return setError('사업자등록번호 10자리를 입력해주세요.');
+    if (digits.length !== 10) return setError(t('register.errBizRequired'));
     if (bizStatus && bizStatus.valid === false) return setError(bizStatus.message);
 
     setLoading(true);
@@ -66,14 +67,15 @@ export default function Register() {
   }
 
   const bizDigits = bizNum.replace(/[^0-9]/g, '');
+  const remaining = 10 - bizDigits.length;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🏪</div>
-          <h1 className="text-2xl font-bold text-zinc-100">상인 회원가입</h1>
-          <p className="text-zinc-500 mt-1">대충실드 QR 상점주로 가입하기</p>
+          <h1 className="text-2xl font-bold text-zinc-100">{t('register.title')}</h1>
+          <p className="text-zinc-500 mt-1">{t('register.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card">
@@ -91,25 +93,25 @@ export default function Register() {
           </AnimatePresence>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">이메일</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('register.email')}</label>
             <input type="email" className="input" value={email} onChange={e => setEmail(e.target.value)} placeholder="yourshop@email.com" required />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">비밀번호</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('register.password')}</label>
             <input type="password" className="input" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
           </div>
 
           <div className="mb-5">
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">비밀번호 확인</label>
+            <label className="block text-sm font-medium text-zinc-400 mb-1.5">{t('register.confirmPassword')}</label>
             <input type="password" className="input" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="••••••••" required />
           </div>
 
           {/* 사업자등록번호 */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-zinc-400 mb-1.5">
-              사업자등록번호
-              <span className="text-zinc-600 font-normal ml-1">(XXX-XX-XXXXX)</span>
+              {t('register.bizNum')}
+              <span className="text-zinc-600 font-normal ml-1">{t('register.bizNumHint')}</span>
             </label>
             <div className="relative">
               <input
@@ -120,7 +122,7 @@ export default function Register() {
                 }`}
                 value={bizNum}
                 onChange={handleBizNumChange}
-                placeholder="000-00-00000"
+                placeholder={t('register.bizNumPlaceholder')}
                 maxLength={12}
                 required
               />
@@ -150,13 +152,13 @@ export default function Register() {
                   animate={{ opacity: 1 }}
                   className="text-xs mt-1.5 text-zinc-600"
                 >
-                  {10 - bizDigits.length}자리 더 입력해주세요
+                  {t('register.bizNumRemaining_other', { count: remaining })}
                 </motion.p>
               )}
             </AnimatePresence>
 
             <div className="mt-2 bg-zinc-800/60 rounded-lg px-3 py-2 text-xs text-zinc-500">
-              💡 사업자등록증에 표시된 10자리 번호를 입력하면 국세청 데이터로 실시간 검증됩니다.
+              {t('register.bizNumInfo')}
             </div>
           </div>
 
@@ -167,22 +169,22 @@ export default function Register() {
             whileHover={!loading ? { scale: 1.01 } : {}}
             whileTap={!loading ? { scale: 0.98 } : {}}
           >
-            {loading ? '가입 중...' : '상인으로 가입하기'}
+            {loading ? t('register.loading') : t('register.submit')}
           </motion.button>
 
           <p className="text-center text-zinc-500 text-sm mt-4">
-            이미 계정이 있으신가요?{' '}
-            <Link to="/login" className="text-indigo-400 hover:text-indigo-300">로그인</Link>
+            {t('register.hasAccount')}{' '}
+            <Link to="/login" className="text-indigo-400 hover:text-indigo-300">{t('register.loginLink')}</Link>
           </p>
         </form>
 
         <div className="card mt-4 p-4">
-          <p className="text-xs text-zinc-500 mb-2 font-semibold">가입 후 진행 순서</p>
+          <p className="text-xs text-zinc-500 mb-2 font-semibold">{t('register.stepsTitle')}</p>
           <ul className="text-sm text-zinc-400 space-y-1.5">
-            <li>1️⃣ 사업자번호 검증 → 계정 생성</li>
-            <li>2️⃣ 상점 등록 (대전·세종·충남·충북)</li>
-            <li>3️⃣ 관리자 상점 승인 대기</li>
-            <li>4️⃣ <span className="text-emerald-400 font-medium">승인 완료</span> → 상품 자유롭게 등록 + QR 발급</li>
+            <li>1️⃣ {t('register.step1')}</li>
+            <li>2️⃣ {t('register.step2')}</li>
+            <li>3️⃣ {t('register.step3')}</li>
+            <li>4️⃣ <span className="text-emerald-400 font-medium">{t('register.step4Highlight')}</span> → {t('register.step4').split(t('register.step4Highlight')).pop()?.replace(/^[\s→]+/, '') || ''}</li>
           </ul>
         </div>
       </div>
