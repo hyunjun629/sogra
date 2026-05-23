@@ -152,6 +152,25 @@
     "regionChungnam": "충남",
     "regionChungbuk": "충북"
   },
+  "publicStore": {
+    "verifying": "QR 검증 중...",
+    "dangerBadge": "위험 — QR 검증 실패",
+    "dangerTitle": "존재하지 않거나 위조 가능성이 있는 QR입니다",
+    "dangerWarning": "이 링크는 공식 대충실드 QR이 아닐 수 있습니다. 결제하거나 개인정보를 입력하지 마십시오.",
+    "dangerSecurityTitle": "⚠️ 보안 경고",
+    "dangerSecurityNote": "이 페이지 접근이 보안 로그에 기록되었습니다.",
+    "goHome": "홈으로 돌아가기",
+    "certifiedBadge": "공식 인증 QR",
+    "warningBadge": "주의 — 승인 대기 중",
+    "productCount": "개",
+    "productsTitle": "상품 목록",
+    "productsEmpty": "등록된 상품이 없습니다.",
+    "originLabel": "원산지",
+    "allergyLabel": "알레르기",
+    "aiPromoLabel": "🤖 AI 홍보 문구",
+    "showDetail": "상세 보기",
+    "hideDetail": "접기"
+  },
   "publicProduct": {
     "verifying": "QR 서명 검증 중...",
     "dangerBadge": "위험 — QR 검증 실패",

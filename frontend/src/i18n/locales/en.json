@@ -152,6 +152,25 @@
     "regionChungnam": "S. Chungcheong",
     "regionChungbuk": "N. Chungcheong"
   },
+  "publicStore": {
+    "verifying": "Verifying QR signature...",
+    "dangerBadge": "DANGER — QR Verification Failed",
+    "dangerTitle": "This QR does not exist or may be counterfeit",
+    "dangerWarning": "This link may not be an official 대충실드 QR. Do not make payments or enter personal information.",
+    "dangerSecurityTitle": "⚠️ Security Warning",
+    "dangerSecurityNote": "Access to this page has been recorded in the security log.",
+    "goHome": "Go Back Home",
+    "certifiedBadge": "Official Certified QR",
+    "warningBadge": "WARNING — Pending Approval",
+    "productCount": "",
+    "productsTitle": "Products",
+    "productsEmpty": "No products registered.",
+    "originLabel": "Origin",
+    "allergyLabel": "Allergy",
+    "aiPromoLabel": "🤖 AI Promo",
+    "showDetail": "Show Details",
+    "hideDetail": "Hide"
+  },
   "publicProduct": {
     "verifying": "Verifying QR signature...",
     "dangerBadge": "DANGER — QR Verification Failed",

@@ -152,6 +152,25 @@
     "regionChungnam": "忠清南道",
     "regionChungbuk": "忠清北道"
   },
+  "publicStore": {
+    "verifying": "正在验证 QR 签名...",
+    "dangerBadge": "危险 — QR 验证失败",
+    "dangerTitle": "该 QR 不存在或可能是伪造的",
+    "dangerWarning": "此链接可能不是官方 대충실드 QR，请勿进行支付或输入个人信息。",
+    "dangerSecurityTitle": "⚠️ 安全警告",
+    "dangerSecurityNote": "访问此页面已记录在安全日志中。",
+    "goHome": "返回首页",
+    "certifiedBadge": "官方认证 QR",
+    "warningBadge": "警告 — 待审批",
+    "productCount": "个",
+    "productsTitle": "商品列表",
+    "productsEmpty": "暂无注册商品。",
+    "originLabel": "产地",
+    "allergyLabel": "过敏原",
+    "aiPromoLabel": "🤖 AI 宣传文案",
+    "showDetail": "查看详情",
+    "hideDetail": "收起"
+  },
   "publicProduct": {
     "verifying": "正在验证 QR 签名...",
     "dangerBadge": "危险 — QR 验证失败",
