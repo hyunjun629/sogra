@@ -4,7 +4,7 @@ const pool = require('../db');
 const { requireAuth, requireMerchant } = require('../middleware/auth');
 const { logSecurity } = require('../utils/logger');
 const { generateQrToken, verifyQrToken, buildQrUrl, generateStoreQrToken, verifyStoreQrToken, buildStoreQrUrl, verifyTimedStoreQrToken, buildTimedStoreQrUrl } = require('../utils/qr');
-const { generatePromoText } = require('../utils/promo');
+const { generatePromoTextAI, generatePromoTextAIEn, generatePromoTextAIZh } = require('../utils/promo');
 
 const router = express.Router();
 
@@ -135,24 +135,28 @@ router.post('/', requireMerchant, async (req, res) => {
     cleanDescription = sanitizeHtml(cleanDescription, { allowedTags: [], allowedAttributes: {} });
 
     const createdAt = Date.now();
-    const promoText = generatePromoText({ name, region: store.region, origin: origin || store.region });
+
+    // Gemini AI 홍보 문구 3개국어 병렬 생성
+    const [promoText, promoTextEn, promoTextZh] = await Promise.all([
+      generatePromoTextAI({ name, region: store.region, origin: origin || store.region, allergy, description: cleanDescription }),
+      generatePromoTextAIEn({ name, name_en: name, region_en: store.region, origin_en: origin || store.region, allergy_en: allergy, description_en: cleanDescription }),
+      generatePromoTextAIZh({ name, name_zh: name, region_zh: store.region, origin_zh: origin || store.region, allergy_zh: allergy, description_zh: cleanDescription }),
+    ]);
 
     const { rows: [{ id: productId }] } = await pool.query(`
       INSERT INTO products
         (store_id, owner_id, name, price, description, origin, allergy, image_url,
          ai_promo_text, ai_promo_text_en, ai_promo_text_zh,
          qr_token, qr_expires_at, is_active, created_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8, '','','', '',$9,1,$10)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8, $9,$10,$11, '',$12,1,$13)
       RETURNING id
     `, [store_id, req.user.id, name, parseInt(price), cleanDescription,
         origin || '', allergy || '', image_url || '',
+        promoText, promoTextEn, promoTextZh,
         Date.now() + 30 * 24 * 60 * 60 * 1000, createdAt]);
 
     const token = generateQrToken(productId, createdAt);
-    await pool.query(
-      'UPDATE products SET qr_token=$1, ai_promo_text=$2 WHERE id=$3',
-      [token, promoText, productId]
-    );
+    await pool.query('UPDATE products SET qr_token=$1 WHERE id=$2', [token, productId]);
 
     const { rows: [product] } = await pool.query('SELECT * FROM products WHERE id=$1', [productId]);
     return res.status(201).json({ product: { ...product, qr_url: buildQrUrl(productId, token) } });
