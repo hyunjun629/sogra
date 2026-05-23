@@ -114,6 +114,13 @@
     "qrModalOpen": "Open Page",
     "qrModalCopy": "Copy",
     "qrModalCopied": "Link copied",
+    "storeQrButton": "📱 View Store QR",
+    "qrGenerating": "Generating QR...",
+    "storeQrModalTitle": "Store Official QR",
+    "storeQrModalLink": "QR Link",
+    "storeQrModalOpen": "Open Page",
+    "storeQrModalCopy": "Copy",
+    "storeQrModalCopied": "Link copied",
     "statusApproved": "Approved",
     "statusPending": "Pending",
     "statusFlagged": "Reported"
@@ -172,6 +179,7 @@
     "hideDetail": "Hide"
   },
   "publicProduct": {
+    "serverError": "A server error occurred.",
     "verifying": "Verifying QR signature...",
     "dangerBadge": "DANGER — QR Verification Failed",
     "dangerTitle": "This QR does not exist or may be counterfeit",

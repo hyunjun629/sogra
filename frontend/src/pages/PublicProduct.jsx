@@ -17,7 +17,7 @@ export default function PublicProduct() {
   useEffect(() => {
     api.getPublicProduct(id, token)
       .then(d => setResult(d))
-      .catch(() => setResult({ status: 'danger', message: '서버 오류가 발생했습니다.' }))
+      .catch(() => setResult({ status: 'danger', message: t('publicProduct.serverError') }))
       .finally(() => setLoading(false));
   }, [id, token]);
 

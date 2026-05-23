@@ -114,6 +114,13 @@
     "qrModalOpen": "페이지 열기",
     "qrModalCopy": "복사",
     "qrModalCopied": "링크 복사됨",
+    "storeQrButton": "📱 상점 QR 보기",
+    "qrGenerating": "QR 생성 중...",
+    "storeQrModalTitle": "상점 공식 인증 QR",
+    "storeQrModalLink": "QR 링크",
+    "storeQrModalOpen": "페이지 열기",
+    "storeQrModalCopy": "복사",
+    "storeQrModalCopied": "링크 복사됨",
     "statusApproved": "승인됨",
     "statusPending": "승인 대기",
     "statusFlagged": "신고됨"
@@ -172,6 +179,7 @@
     "hideDetail": "접기"
   },
   "publicProduct": {
+    "serverError": "서버 오류가 발생했습니다.",
     "verifying": "QR 서명 검증 중...",
     "dangerBadge": "위험 — QR 검증 실패",
     "dangerTitle": "존재하지 않거나 위조 가능성이 있는 QR입니다",

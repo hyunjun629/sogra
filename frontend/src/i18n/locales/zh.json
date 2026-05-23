@@ -114,6 +114,13 @@
     "qrModalOpen": "打开页面",
     "qrModalCopy": "复制",
     "qrModalCopied": "链接已复制",
+    "storeQrButton": "📱 查看店铺 QR",
+    "qrGenerating": "QR 生成中...",
+    "storeQrModalTitle": "店铺官方认证 QR",
+    "storeQrModalLink": "QR 链接",
+    "storeQrModalOpen": "打开页面",
+    "storeQrModalCopy": "复制",
+    "storeQrModalCopied": "链接已复制",
     "statusApproved": "已审批",
     "statusPending": "待审批",
     "statusFlagged": "已举报"
@@ -172,6 +179,7 @@
     "hideDetail": "收起"
   },
   "publicProduct": {
+    "serverError": "服务器发生错误。",
     "verifying": "正在验证 QR 签名...",
     "dangerBadge": "危险 — QR 验证失败",
     "dangerTitle": "该 QR 不存在或可能是伪造的",

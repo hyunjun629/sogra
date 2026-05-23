@@ -184,10 +184,10 @@ export default function MerchantDashboard() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    📱 {t('dashboard.storeQrButton') || '상점 QR 보기'}
+                    {t('dashboard.storeQrButton')}
                   </motion.button>
                 ) : (
-                  <p className="text-xs text-zinc-600">QR 생성 중...</p>
+                  <p className="text-xs text-zinc-600">{t('dashboard.qrGenerating')}</p>
                 )}
               </motion.div>
             ))}
@@ -267,7 +267,7 @@ export default function MerchantDashboard() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-zinc-100">상점 공식 인증 QR</h3>
+                <h3 className="font-bold text-zinc-100">{t('dashboard.storeQrModalTitle')}</h3>
                 <button onClick={() => setSelectedStoreQr(null)} className="text-zinc-500 hover:text-zinc-300 text-xl">✕</button>
               </div>
               <div className="flex justify-center mb-4">
@@ -278,17 +278,17 @@ export default function MerchantDashboard() {
               <p className="text-center font-semibold text-zinc-200 mb-1">{selectedStoreQr.name}</p>
               <p className="text-center text-sm text-zinc-500 mb-3">{selectedStoreQr.region} · {selectedStoreQr.location}</p>
               <div className="bg-zinc-800 rounded-lg p-3 mb-4">
-                <p className="text-xs text-zinc-500 mb-1">QR 링크</p>
+                <p className="text-xs text-zinc-500 mb-1">{t('dashboard.storeQrModalLink')}</p>
                 <p className="text-xs font-mono text-zinc-300 break-all">{selectedStoreQr.store_qr_url}</p>
               </div>
               <div className="flex gap-2">
                 <a href={selectedStoreQr.store_qr_url} target="_blank" rel="noopener noreferrer" className="btn-primary text-sm py-2 flex-1 text-center">
-                  페이지 열기
+                  {t('dashboard.storeQrModalOpen')}
                 </a>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(selectedStoreQr.store_qr_url); showToast('링크 복사됨'); }}
+                  onClick={() => { navigator.clipboard.writeText(selectedStoreQr.store_qr_url); showToast(t('dashboard.storeQrModalCopied')); }}
                   className="btn-ghost text-sm py-2 px-4"
-                >복사</button>
+                >{t('dashboard.storeQrModalCopy')}</button>
               </div>
             </motion.div>
           </motion.div>
