@@ -8,6 +8,20 @@ const { generatePromoText } = require('../utils/promo');
 
 const router = express.Router();
 
+// 공개 API — 지역별 승인된 상점 수 (랜딩 지도용)
+router.get('/region-counts', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT region, COUNT(*) as count FROM stores WHERE status = 'approved' GROUP BY region`
+    );
+    const counts = {};
+    rows.forEach(r => { counts[r.region] = parseInt(r.count); });
+    res.json(counts);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.get('/public/:id', async (req, res) => {
   try {
     const { id } = req.params;

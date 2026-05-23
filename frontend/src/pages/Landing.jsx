@@ -26,17 +26,9 @@ export default function Landing() {
       })
       .catch(() => {});
 
-    fetch('/api/admin/stores', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('ls_token')}` }
-    })
+    fetch('/api/products/region-counts')
       .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d?.stores) {
-          const counts = {};
-          d.stores.forEach(s => { counts[s.region] = (counts[s.region] || 0) + 1; });
-          setStoreCounts(counts);
-        }
-      })
+      .then(d => { if (d) setStoreCounts(d); })
       .catch(() => {});
   }, []);
 
